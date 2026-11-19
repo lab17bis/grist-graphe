@@ -1,0 +1,80 @@
+/* Mise en page propre à grist-graphe. Les composants viennent du DSFR. */
+
+html, body { height: 100%; }
+body { background: var(--background-default-grey); color: var(--text-default-grey); display: flex; flex-direction: column; margin: 0; }
+.gg-marge { padding-left: 1rem; padding-right: 1rem; }
+.gg-evitement { position: absolute; left: -999px; }
+.gg-evitement:focus { left: 1rem; top: .5rem; z-index: 2000; background: var(--background-default-grey); }
+
+.gg-cadre { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(16rem, 22rem) 1fr; }
+.gg-cote { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--border-default-grey); }
+.gg-panneau { flex: 1; overflow-y: auto; padding: 1rem; }
+.gg-panneau:focus { outline: none; }
+.gg-principal { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.gg-barre { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; padding: .5rem 1rem; border-bottom: 1px solid var(--border-default-grey); }
+.gg-vues { display: flex; gap: .5rem; }
+.gg-vues .fr-btn, .gg-barre > .fr-btn { margin: 0; }
+.gg-graphe { flex: 1; min-height: 20rem; }
+.gg-liste { flex: 1; overflow: auto; padding: 1rem; }
+.gg-info:empty { display: none; }
+.gg-info { padding: .5rem 1rem 0; }
+.gg-callout { margin: 1rem 0; }
+.gg-legende-positions { margin: 0; color: var(--text-mention-grey); }
+@media (max-width: 48em) {
+  html, body { height: auto; }
+  .gg-cadre { display: flex; flex-direction: column; }
+  .gg-principal { order: 1; }
+  .gg-graphe { height: 60vh; flex: none; }
+  .gg-cote { order: 2; border-right: 0; border-top: 1px solid var(--border-default-grey); }
+  .gg-panneau { overflow: visible; }
+}
+
+.gg-pied { display: flex; flex-wrap: nowrap; align-items: center; gap: .25rem; padding: .25rem .5rem; border-top: 1px solid var(--border-default-grey); }
+.gg-pied .fr-btn { margin: 0; flex: none; }
+.gg-theme-label { margin: 0 0 0 auto; font-size: .875rem; }
+.gg-pied .fr-select { width: 6.5rem; margin: 0 0 0 .25rem; flex: none; }
+
+.gg-titre { margin-bottom: .75rem; }
+.gg-alerte { margin-bottom: 1rem; }
+.gg-compte { color: var(--text-mention-grey); font-size: .875rem; font-weight: 400; }
+.gg-trouver { display: flex; align-items: flex-end; gap: .5rem; margin-bottom: 1rem; }
+.gg-trouver .fr-input-group { flex: 1; margin: 0; }
+.gg-trouver .fr-btn { margin: 0; flex: none; }
+.gg-filtre { margin-bottom: .5rem; }
+.gg-filtre .fr-fieldset__legend { padding-bottom: .5rem; }
+.gg-filtre .fr-fieldset__element { margin-bottom: .25rem; }
+.gg-filtre .fr-label { display: flex; align-items: center; gap: .375rem; }
+.gg-pastille { display: inline-block; flex: none; width: .875rem; height: .875rem; margin-right: .375rem; vertical-align: middle; }
+.gg-pastille--circle { border-radius: 50%; }
+.gg-pastille--roundRect { border-radius: 3px; }
+.gg-pastille--diamond { transform: rotate(45deg) scale(.85); }
+.gg-trait { display: inline-block; width: 1.5rem; border-top: 3px solid #929292; margin-right: .25rem; }
+.gg-trait--dashed { border-top-style: dashed; }
+.gg-trait--dotted { border-top-style: dotted; }
+.gg-legende-types { list-style: none; padding: 0; margin: 0 0 1rem; font-size: .875rem; }
+.gg-legende-types li { padding: .125rem 0; }
+.gg-top { padding-left: 1.25rem; margin: 0; }
+.gg-encart { margin-top: 1rem; padding: .75rem; background: var(--background-alt-blue-france); }
+
+.gg-retour { margin-bottom: .5rem; }
+.gg-fiche__cat { display: flex; align-items: center; font-size: .875rem; font-weight: 700; margin-bottom: .25rem; }
+#gg-fiche-titre:focus, #gg-reglages-titre:focus { outline: 2px solid #0a76f6; outline-offset: 2px; }
+.gg-infos { font-size: .875rem; margin: 0 0 1rem; padding: 0; }
+.gg-infos dt { font-weight: 700; padding: 0; margin: 0; }
+.gg-infos dd { margin: 0 0 .5rem; padding: 0; }
+.gg-notes { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.gg-notes .fr-select-group { margin: 0; }
+.gg-type-lien { font-weight: 700; font-size: .875rem; margin: .75rem 0 .25rem; }
+.gg-voisins { list-style: none; padding: 0; margin: 0; }
+.gg-voisins li { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .125rem 0; border-bottom: 1px solid var(--border-default-grey); }
+.gg-suppr { margin: 0; flex: none; }
+.gg-details { margin-top: 1rem; border: 1px solid var(--border-default-grey); padding: .5rem .75rem; }
+.gg-details summary { cursor: pointer; font-weight: 700; font-size: .875rem; color: var(--text-action-high-blue-france); }
+.gg-form-lien { margin-top: .75rem; }
+.gg-form-lien .fr-input-group, .gg-form-lien .fr-select-group { margin-bottom: .75rem; }
+.gg-chemin { font-size: .875rem; margin: .75rem 0 .5rem; padding-left: 1.25rem; }
+
+.gg-reglage-table { border-top: 1px solid var(--border-default-grey); padding: .5rem 0; }
+.gg-reglage-cols { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .5rem; }
+.gg-reglage-cols .fr-select-group, .gg-reglage-cols .fr-input-group { margin: 0; }
+.gg-liste-vue .fr-table { margin-bottom: 1rem; }

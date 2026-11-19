@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr" data-fr-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Liens entre acteurs</title>
+  <link rel="stylesheet" href="vendor/dsfr/dsfr.min.css">
+  <link rel="stylesheet" href="vendor/dsfr/utility/icons/icons.min.css">
+  <link rel="stylesheet" href="css/app.css?v=1">
+  <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
+</head>
+<body>
+  <a class="fr-link gg-evitement" href="#gg-panneau">Aller au panneau des acteurs</a>
+  <div id="gg-demo" class="fr-notice fr-notice--info" hidden>
+    <div class="gg-marge">
+      <div class="fr-notice__body">
+        <p class="fr-notice__title">Mode démonstration : données fictives, rien n'est enregistré.</p>
+      </div>
+    </div>
+  </div>
+  <main class="gg-cadre">
+    <div class="gg-cote">
+      <div id="gg-panneau" class="gg-panneau" tabindex="-1"><p>Chargement…</p></div>
+      <div class="gg-pied">
+        <button type="button" class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-settings-5-line fr-btn--icon-left" id="gg-reglages">Réglages</button>
+        <button type="button" class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left" id="gg-actualiser">Actualiser</button>
+        <label class="fr-label gg-theme-label" for="gg-theme">Thème</label>
+        <select class="fr-select fr-select--sm gg-theme" id="gg-theme">
+          <option value="auto">Auto</option>
+          <option value="light">Clair</option>
+          <option value="dark">Sombre</option>
+        </select>
+      </div>
+    </div>
+    <div class="gg-principal">
+      <div class="gg-barre">
+        <div class="gg-vues" role="group" aria-label="Vue">
+          <button type="button" class="fr-btn fr-btn--sm" data-vue="graphe" aria-pressed="true">Graphe</button>
+          <button type="button" class="fr-btn fr-btn--sm fr-btn--secondary" data-vue="positions" aria-pressed="false">Positions</button>
+          <button type="button" class="fr-btn fr-btn--sm fr-btn--secondary" data-vue="liste" aria-pressed="false">Liste</button>
+        </div>
+        <button type="button" class="fr-btn fr-btn--sm fr-btn--tertiary-no-outline fr-icon-refresh-line fr-btn--icon-left" id="gg-reorganiser" title="Recalculer la disposition du graphe">Réorganiser</button>
+      </div>
+      <div id="gg-info" class="gg-info"></div>
+      <div id="gg-graphe" class="gg-graphe" role="img" aria-label="Graphe des liens entre acteurs. La vue Liste en donne le contenu sous forme de tableaux."></div>
+      <div id="gg-liste" class="gg-liste" hidden></div>
+    </div>
+  </main>
+  <script src="vendor/echarts/echarts.min.js"></script>
+  <script src="vendor/echarts/langFR.js"></script>
+  <script src="js/app.js?v=1"></script>
+</body>
+</html>

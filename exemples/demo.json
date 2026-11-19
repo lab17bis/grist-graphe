@@ -1,0 +1,520 @@
+{
+ "tables": {
+  "Structures": {
+   "colonnes": {
+    "Nom": "Text",
+    "Type": {
+     "type": "Choice",
+     "choices": [
+      "Établissement",
+      "Circonscription",
+      "Service",
+      "Direction",
+      "Partenaire"
+     ]
+    },
+    "Parent": {
+     "type": "Ref:Structures",
+     "label": "Rattachée à"
+    },
+    "Influence": "Int",
+    "Interet": {
+     "type": "Int",
+     "label": "Intérêt"
+    }
+   },
+   "lignes": [
+    {
+     "id": 1,
+     "Nom": "Collège A",
+     "Type": "Établissement",
+     "Parent": null,
+     "Influence": 3,
+     "Interet": 4
+    },
+    {
+     "id": 2,
+     "Nom": "Lycée B",
+     "Type": "Établissement",
+     "Parent": null,
+     "Influence": 3,
+     "Interet": 3
+    },
+    {
+     "id": 3,
+     "Nom": "École C",
+     "Type": "Établissement",
+     "Parent": 5,
+     "Influence": 2,
+     "Interet": 4
+    },
+    {
+     "id": 4,
+     "Nom": "Lycée professionnel D",
+     "Type": "Établissement",
+     "Parent": null,
+     "Influence": 3,
+     "Interet": 2
+    },
+    {
+     "id": 5,
+     "Nom": "Circonscription E",
+     "Type": "Circonscription",
+     "Parent": null,
+     "Influence": 4,
+     "Interet": 3
+    },
+    {
+     "id": 6,
+     "Nom": "Service de la formation",
+     "Type": "Service",
+     "Parent": 7,
+     "Influence": 4,
+     "Interet": 5
+    },
+    {
+     "id": 7,
+     "Nom": "Direction des ressources humaines",
+     "Type": "Direction",
+     "Parent": null,
+     "Influence": 5,
+     "Interet": 3
+    },
+    {
+     "id": 8,
+     "Nom": "Association F",
+     "Type": "Partenaire",
+     "Parent": null,
+     "Influence": 2,
+     "Interet": 5
+    },
+    {
+     "id": 9,
+     "Nom": "Médiathèque K",
+     "Type": "Partenaire",
+     "Parent": null,
+     "Influence": 1,
+     "Interet": 3
+    },
+    {
+     "id": 10,
+     "Nom": "Tiers-lieu L",
+     "Type": "Partenaire",
+     "Parent": null,
+     "Influence": 2,
+     "Interet": 4
+    }
+   ]
+  },
+  "Personnes": {
+   "colonnes": {
+    "Nom": {
+     "type": "Text",
+     "label": "Nom et prénom"
+    },
+    "Fonction": "Text",
+    "Structure": {
+     "type": "Ref:Structures",
+     "label": "Structure de rattachement"
+    },
+    "Email": {
+     "type": "Text",
+     "label": "Adresse électronique"
+    },
+    "Influence": "Int",
+    "Interet": {
+     "type": "Int",
+     "label": "Intérêt"
+    }
+   },
+   "lignes": [
+    {
+     "id": 1,
+     "Nom": "MARTIN Camille",
+     "Fonction": "Principale adjointe",
+     "Structure": 1,
+     "Email": "camille.martin@exemple.fr",
+     "Influence": 3,
+     "Interet": 4
+    },
+    {
+     "id": 2,
+     "Nom": "BERNARD Dominique",
+     "Fonction": "Conseiller principal d'éducation",
+     "Structure": 2,
+     "Email": "dominique.bernard@exemple.fr",
+     "Influence": 2,
+     "Interet": 3
+    },
+    {
+     "id": 3,
+     "Nom": "PETIT Alex",
+     "Fonction": "Directeur d'école",
+     "Structure": 3,
+     "Email": "alex.petit@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 4,
+     "Nom": "DURAND Sacha",
+     "Fonction": "Professeure",
+     "Structure": 4,
+     "Email": "sacha.durand@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 5,
+     "Nom": "LEROY Morgan",
+     "Fonction": "Conseiller pédagogique",
+     "Structure": 5,
+     "Email": "morgan.leroy@exemple.fr",
+     "Influence": 4,
+     "Interet": 4
+    },
+    {
+     "id": 6,
+     "Nom": "MOREAU Charlie",
+     "Fonction": "Formatrice",
+     "Structure": 6,
+     "Email": "charlie.moreau@exemple.fr",
+     "Influence": 3,
+     "Interet": 5
+    },
+    {
+     "id": 7,
+     "Nom": "SIMON Lou",
+     "Fonction": "Chargée de mission",
+     "Structure": 7,
+     "Email": "lou.simon@exemple.fr",
+     "Influence": 5,
+     "Interet": 5
+    },
+    {
+     "id": 8,
+     "Nom": "LAURENT Noa",
+     "Fonction": "Proviseur adjoint",
+     "Structure": 2,
+     "Email": "noa.laurent@exemple.fr",
+     "Influence": 3,
+     "Interet": 2
+    },
+    {
+     "id": 9,
+     "Nom": "MICHEL Eden",
+     "Fonction": "Professeure documentaliste",
+     "Structure": 1,
+     "Email": "eden.michel@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 10,
+     "Nom": "GARCIA Maxime",
+     "Fonction": "Chef de projet",
+     "Structure": 8,
+     "Email": "maxime.garcia@exemple.fr",
+     "Influence": 2,
+     "Interet": 5
+    },
+    {
+     "id": 11,
+     "Nom": "DAVID Andréa",
+     "Fonction": "Professeur",
+     "Structure": 4,
+     "Email": "andrea.david@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 12,
+     "Nom": "BERTRAND Jules",
+     "Fonction": "Directrice d'école",
+     "Structure": 3,
+     "Email": "jules.bertrand@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 13,
+     "Nom": "ROUX Inès",
+     "Fonction": "Gestionnaire",
+     "Structure": 7,
+     "Email": "ines.roux@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 14,
+     "Nom": "VINCENT Hugo",
+     "Fonction": "Formateur",
+     "Structure": 6,
+     "Email": "hugo.vincent@exemple.fr",
+     "Influence": 3,
+     "Interet": 4
+    },
+    {
+     "id": 15,
+     "Nom": "FOURNIER Nina",
+     "Fonction": "Infirmière",
+     "Structure": 1,
+     "Email": "nina.fournier@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 16,
+     "Nom": "MOREL Malik",
+     "Fonction": "Professeur",
+     "Structure": 2,
+     "Email": "malik.morel@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 17,
+     "Nom": "GIRARD Rose",
+     "Fonction": "Psychologue de l'éducation nationale",
+     "Structure": 5,
+     "Email": "rose.girard@exemple.fr",
+     "Influence": null,
+     "Interet": null
+    },
+    {
+     "id": 18,
+     "Nom": "ANDRÉ Paul",
+     "Fonction": "Animateur numérique",
+     "Structure": 9,
+     "Email": "paul.andre@exemple.fr",
+     "Influence": 2,
+     "Interet": 4
+    }
+   ]
+  },
+  "Groupes": {
+   "colonnes": {
+    "Nom": "Text",
+    "Type": "Choice",
+    "Membres": "RefList:Personnes"
+   },
+   "lignes": [
+    {
+     "id": 1,
+     "Nom": "Codéveloppement 1",
+     "Type": "Groupe de codéveloppement",
+     "Membres": [
+      "L",
+      1,
+      2,
+      3,
+      4,
+      9,
+      11
+     ]
+    },
+    {
+     "id": 2,
+     "Nom": "Codéveloppement 2",
+     "Type": "Groupe de codéveloppement",
+     "Membres": [
+      "L",
+      5,
+      8,
+      12,
+      13,
+      15,
+      16,
+      17
+     ]
+    },
+    {
+     "id": 3,
+     "Nom": "Accueil des nouveaux collègues",
+     "Type": "Groupe de travail",
+     "Membres": [
+      "L",
+      1,
+      7,
+      9,
+      10,
+      13
+     ]
+    }
+   ]
+  },
+  "Liens": {
+   "colonnes": {
+    "De": "Text",
+    "Vers": "Text",
+    "Type": {
+     "type": "Choice",
+     "choices": [
+      "Coopère avec",
+      "Fait partie de",
+      "Accompagne",
+      "Finance",
+      "Conseille",
+      "Influence",
+      "Partenaire de"
+     ]
+    },
+    "Force": "Int",
+    "Sens": {
+     "type": "Choice",
+     "choices": [
+      "Réciproque",
+      "À sens unique"
+     ]
+    },
+    "Note": "Text"
+   },
+   "lignes": [
+    {
+     "id": 1,
+     "De": "Service de la formation",
+     "Vers": "Circonscription E",
+     "Type": "Accompagne",
+     "Force": 2,
+     "Sens": "À sens unique",
+     "Note": ""
+    },
+    {
+     "id": 2,
+     "De": "Direction des ressources humaines",
+     "Vers": "Service de la formation",
+     "Type": "Finance",
+     "Force": 3,
+     "Sens": "À sens unique",
+     "Note": "Budget de formation"
+    },
+    {
+     "id": 3,
+     "De": "Collège A",
+     "Vers": "Association F",
+     "Type": "Coopère avec",
+     "Force": 2,
+     "Sens": "Réciproque",
+     "Note": "Projet culturel"
+    },
+    {
+     "id": 4,
+     "De": "Lycée professionnel D",
+     "Vers": "Tiers-lieu L",
+     "Type": "Partenaire de",
+     "Force": 2,
+     "Sens": "Réciproque",
+     "Note": "Atelier de fabrication"
+    },
+    {
+     "id": 5,
+     "De": "Médiathèque K",
+     "Vers": "École C",
+     "Type": "Coopère avec",
+     "Force": 1,
+     "Sens": "Réciproque",
+     "Note": "Ateliers numériques"
+    },
+    {
+     "id": 6,
+     "De": "SIMON Lou",
+     "Vers": "MOREAU Charlie",
+     "Type": "Coopère avec",
+     "Force": 3,
+     "Sens": "Réciproque",
+     "Note": "Co-animation du réseau"
+    },
+    {
+     "id": 7,
+     "De": "SIMON Lou",
+     "Vers": "Direction des ressources humaines",
+     "Type": "Conseille",
+     "Force": 2,
+     "Sens": "À sens unique",
+     "Note": ""
+    },
+    {
+     "id": 8,
+     "De": "GARCIA Maxime",
+     "Vers": "MARTIN Camille",
+     "Type": "Coopère avec",
+     "Force": 2,
+     "Sens": "Réciproque",
+     "Note": ""
+    },
+    {
+     "id": 9,
+     "De": "LEROY Morgan",
+     "Vers": "PETIT Alex",
+     "Type": "Accompagne",
+     "Force": 2,
+     "Sens": "À sens unique",
+     "Note": ""
+    },
+    {
+     "id": 10,
+     "De": "ANDRÉ Paul",
+     "Vers": "MICHEL Eden",
+     "Type": "Coopère avec",
+     "Force": 1,
+     "Sens": "Réciproque",
+     "Note": "Éducation aux médias"
+    },
+    {
+     "id": 11,
+     "De": "VINCENT Hugo",
+     "Vers": "GIRARD Rose",
+     "Type": "Conseille",
+     "Force": 1,
+     "Sens": "Réciproque",
+     "Note": ""
+    },
+    {
+     "id": 12,
+     "De": "MOREAU Charlie",
+     "Vers": "Lycée B",
+     "Type": "Accompagne",
+     "Force": 2,
+     "Sens": "À sens unique",
+     "Note": "Formation d'initiative locale"
+    },
+    {
+     "id": 13,
+     "De": "Association F",
+     "Vers": "GARCIA Maxime",
+     "Type": "Influence",
+     "Force": 3,
+     "Sens": "À sens unique",
+     "Note": ""
+    }
+   ]
+  }
+ },
+ "options": {
+  "titre": "Acteurs du réseau",
+  "acteurs": [
+   {
+    "table": "Structures",
+    "nom": "Nom",
+    "type": "Type",
+    "libelle": "Structures"
+   },
+   {
+    "table": "Personnes",
+    "nom": "Nom",
+    "type": "Fonction",
+    "libelle": "Personnes"
+   }
+  ],
+  "liens": "Liens",
+  "appartenance": true,
+  "participations": [
+   {
+    "table": "Groupes",
+    "membres": "Membres",
+    "groupe": "",
+    "libelle": "Membres du même groupe"
+   }
+  ]
+ }
+}
