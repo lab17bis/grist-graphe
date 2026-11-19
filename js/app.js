@@ -585,6 +585,16 @@
     panneau.innerHTML = etat.panneau === 'reglages' ? vueReglages() : (etat.panneau === 'fiche' && x) ? vueFiche(x) : vueFiltres();
   }
   function rendre() { rendrePanneau(); rendreVue(); }
+  // Une mise à jour venue de Grist pendant une saisie dans le panneau attend la fin de la saisie.
+  var rendreApres = false;
+  function rendreSiLibre() {
+    var a = document.activeElement;
+    if (a && panneau.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) { rendreApres = true; rendreVue(); return; }
+    rendre();
+  }
+  panneau.addEventListener('focusout', function (e) {
+    if (rendreApres && !(e.relatedTarget && panneau.contains(e.relatedTarget) && /^(INPUT|TEXTAREA|SELECT|BUTTON)$/.test(e.relatedTarget.tagName))) { rendreApres = false; setTimeout(rendrePanneau, 0); }
+  });
 
   function selectionner(id, focaliser) {
     etat.selection = id; etat.chemin = null; etat.cheminVide = false; etat.cheminVers = ''; etat.lienForm = {};
@@ -798,7 +808,7 @@
     grist.onRecords(function () {
       if (!pret) return;
       clearTimeout(attente);
-      attente = setTimeout(function () { charger().then(rendre).catch(erreur); }, 200);
+      attente = setTimeout(function () { charger().then(rendreSiLibre).catch(erreur); }, 200);
     });
     // Sans réglages enregistrés, Grist peut ne pas appeler onOptions : chargement par défaut.
     setTimeout(function () { if (!pret) charger().then(function () { pret = true; rendre(); }).catch(erreur); }, 1500);

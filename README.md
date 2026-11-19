@@ -53,7 +53,7 @@ Pour la vue *Positions*, le widget propose d'ajouter les colonnes `Influence` et
 | `outils/figer-version.sh` | Copie la version en cours dans `vN/`. |
 | `index.html`, `js/app.js`, `css/app.css` | L'application : construction du graphe, vues, fiche, chemin, réglages |
 | `exemples/demo.json` | Document fictif utilisé par la démonstration (tables et réglages) |
-| `tests/` | Tests automatisés de l'interface : `python3 tests/test_graphe.py` (Playwright) |
+| `tests/` | Tests automatisés de l'interface : `python3 tests/test_graphe.py` (Playwright), et fonctionnement dans Grist avec une API simulée : `python3 tests/test_dans_grist.py` |
 | `vendor/` | DSFR et Apache ECharts, embarqués pour ne dépendre d'aucun service externe |
 
 ## Fonctionnement et sécurité
@@ -98,9 +98,12 @@ Ce widget est assemblé dans [espace-reseau](https://github.com/lab17bis/espace-
 - [grist-catalogue](https://github.com/lab17bis/grist-catalogue) : catalogue public de fiches au DSFR.
 - [grist-graphique](https://github.com/lab17bis/grist-graphique) : tableaux de bord et graphiques au DSFR.
 - [grist-projet](https://github.com/lab17bis/grist-projet) : espace d'équipe pour gérer des projets.
-- [grist-management](https://github.com/lab17bis/grist-management) : écran de management visuel d'équipe, qui affiche aussi la prochaine réunion et les actions ouvertes.
+- [grist-reunion](https://github.com/lab17bis/grist-reunion) : réunions : ordre du jour, séance, compte rendu et suivi des actions.
+- [grist-management](https://github.com/lab17bis/grist-management) : écran de management visuel d'équipe.
+- [grist-decision](https://github.com/lab17bis/grist-decision) : consultations : boîte à idées, valorisation des réalisations, votes et suites données.
+- [grist-carte](https://github.com/lab17bis/grist-carte) : carte interactive des lignes d'une table, au fond de l'IGN.
 
-Ils partagent les mêmes réglages d'en-tête et de pied de page.
+Les widgets qui ont un en-tête et un pied de page partagent les mêmes réglages.
 
 ## Écosystème
 
