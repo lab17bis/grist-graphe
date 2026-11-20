@@ -90,7 +90,10 @@ Ce que fait cet outil : il lit `Personnes` et `Structures` (et toute autre table
 
 ## Espaces clés en main
 
-Ce widget est assemblé dans [espace-reseau](https://github.com/lab17bis/espace-reseau) : les acteurs du réseau, leurs liens saisis, leurs rattachements et leur participation aux mêmes groupes, avec la carte des structures. Il s'ajoute aussi à tout document qui contient des personnes ou des structures, par exemple pour cartographier les parties prenantes d'un projet dans [espace-pilotage](https://github.com/lab17bis/espace-pilotage) ou [espace-accompagnement](https://github.com/lab17bis/espace-accompagnement).
+Ce widget est assemblé, avec d'autres, dans des **espaces** : des documents Grist prêts à l'emploi.
+
+- [espace-reseau](https://github.com/lab17bis/espace-reseau) : structures et membres du réseau, liens saisis, rattachements et appartenance aux mêmes groupes (page *Liens entre acteurs*).
+- [espace-pilotage](https://github.com/lab17bis/espace-pilotage) : parties prenantes des projets, reliées par les fiches projet (structure porteuse, porteurs, équipe), sans saisie supplémentaire (page *Parties prenantes*).
 
 ## Autres outils de la même famille
 
