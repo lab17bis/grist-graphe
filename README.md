@@ -36,7 +36,7 @@ Le widget suit la ligne sélectionnée dans Grist : choisir une personne dans un
 Les réglages sont enregistrés **avec le widget** (propres à la vue) :
 
 - **Tables d'acteurs** : pour chacune, la colonne du nom, la colonne du type et un libellé (« Structures », « Personnes »…). Chaque table a sa forme : carré arrondi, rond, losange, triangle.
-- **Table des liens**, **rattachements** (oui ou non) et **sources de participation commune** : table, colonne qui cite les acteurs (référence multiple, liste de choix ou texte séparé par des virgules), regroupement facultatif.
+- **Table des liens**, **rattachements** (oui ou non) et **sources de participation commune** : table, colonne qui cite les acteurs (référence multiple, liste de choix ou texte séparé par des virgules), regroupement facultatif. Une source peut ne retenir que certaines lignes : dans les options du widget, `"condition": { "colonne": "Type", "operateur": "different", "valeur": "Plénière" }` écarte par exemple les plénières, où tout le monde se croise.
 - **Affichage** : couleur selon la table ou selon le type, taille selon le nombre de liens ou l'influence, noms toujours affichés, acteurs isolés masqués.
 
 Pour la vue *Positions*, le widget propose d'ajouter les colonnes `Influence` et `Interet` (entiers de 0 à 5) aux tables d'acteurs. Elles se renseignent dans la fiche de chaque acteur.

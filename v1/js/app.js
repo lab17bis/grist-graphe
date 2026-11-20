@@ -219,7 +219,11 @@
       var groupes = {};
       (lignes[p.table] || []).forEach(function (r) {
         var g = p.groupe ? JSON.stringify(r[p.groupe]) : 'r' + r.id;
-        if (p.condition && p.condition.colonne && String(r[p.condition.colonne]) !== String(p.condition.valeur)) return;
+        // Condition facultative : { colonne, valeur, operateur: 'egal' (par défaut) ou 'different' }.
+        if (p.condition && p.condition.colonne) {
+          var egal = String(r[p.condition.colonne]) === String(p.condition.valeur);
+          if (p.condition.operateur === 'different' ? egal : !egal) return;
+        }
         var etiquette = p.groupe ? valeurTexte(p.table, p.groupe, r[p.groupe]) : String(r.Nom || r.Titre || r.Libelle || '#' + r.id);
         groupes[g] = groupes[g] || { etiquette: etiquette, membres: {} };
         liste(r[p.membres]).forEach(function (v) { var x = trouver(v, p.table, p.membres); if (x) groupes[g].membres[x.id] = x; });
