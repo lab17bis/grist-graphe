@@ -118,6 +118,14 @@ Les widgets qui ont un en-tête et un pied de page partagent les mêmes réglage
 
 Grist, widget Grist, graphe, réseau, cartographie des acteurs, cartographie des parties prenantes, sociogramme, analyse de réseau, liens, influence, intérêt, matrice influence intérêt, partenaires, écosystème, DSFR, Système de design de l'État, La Suite numérique, DINUM, service public, logiciel libre.
 
+## Page publique
+
+Paramètres de l'adresse : `public=1&doc=<lien>&table=<table des acteurs>`. La page affiche le graphe, les filtres et les fiches ; l'ajout, la modification et la suppression de liens sont retirés.
+
+L'onglet **Publication** construit le lien d'une page publique : collez le lien du document Grist partagé en lecture publique (*Partager › Accès public : Lecteur*), puis copiez ou ouvrez le lien obtenu. La page est en lecture seule, sans compte, et n'écrit jamais dans le document. L'option `integre=1` retire l'en-tête et le pied de page pour intégrer la page dans un autre site ou dans le [portail](https://github.com/lab17bis/grist-portail).
+
+Le partage en lecture publique rend lisibles **toutes** les tables du document, pas seulement celles que la page affiche. Pour masquer une table ou une colonne au public, utilisez les règles d'accès de Grist, par exemple avec la condition `not user.IsLoggedIn` (lecture refusée). La page tolère une table masquée. Testez en navigation privée avant de diffuser le lien.
+
 ## Licence
 
 Code sous licence MIT (voir `LICENSE`). Le DSFR embarqué dans `vendor/dsfr/` et Apache ECharts dans `vendor/echarts/` (licence Apache 2.0) conservent leur propre licence. Réutilisation, adaptation et contributions bienvenues.
