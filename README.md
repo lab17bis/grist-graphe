@@ -27,7 +27,7 @@ Démonstration avec des données fictives (rien n'est enregistré) : <https://la
 
 1. **Ouvrir le document Grist** qui contient les acteurs, par exemple les tables `Structures` et `Personnes` partagées par les outils de la même famille.
 2. **Ajouter le widget** : *Ajouter › Ajouter un widget à la page › Personnalisé*, de préférence sur la table `Personnes` ou `Structures`. Dans le panneau de droite, choisissez *URL personnalisée*, saisissez `https://lab17bis.github.io/grist-graphe/v1/` et donnez l'**accès complet au document**.
-3. **Vérifier les réglages** (bouton *Configurer*, qui ouvre aussi l'en-tête et le pied de page, l'aperçu et la publication ; le bouton *Réglages* reste disponible) : le widget reconnaît seul les tables `Structures`, `Personnes`, `Acteurs` ou `Partenaires` et la table `Liens`. Cliquez sur *Créer la table Liens* pour commencer à saisir des liens.
+3. **Vérifier les réglages** (onglet *Réglages* de la barre d'onglets, qui réunit aussi *En-tête et pied*, *Aperçu* et *Publication* ; le bouton *Réglages* du panneau y mène aussi) : le widget reconnaît seul les tables `Structures`, `Personnes`, `Acteurs` ou `Partenaires` et la table `Liens`. Cliquez sur *Créer la table Liens* pour commencer à saisir des liens.
 
 Le widget suit la ligne sélectionnée dans Grist : choisir une personne dans un tableau ouvre sa fiche dans le graphe, et inversement.
 

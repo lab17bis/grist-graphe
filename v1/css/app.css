@@ -80,5 +80,12 @@ body { background: var(--background-default-grey); color: var(--text-default-gre
 .gg-liste-vue .fr-table { margin-bottom: 1rem; }
 
 /* Page de configuration unique : on masque ce que la barre de configuration fait déjà (ajout 2026-11-24) */
-.cl-config .gg-retour, .cl-config #gg-reglages-titre, .cl-config .gg-actions-reglages { display: none; }
-.cl-config .gg-panneau { overflow: visible; }
+#gg-reglages-zone .gg-retour, #gg-reglages-zone #gg-reglages-titre, #gg-reglages-zone .gg-actions-reglages { display: none; }
+
+/* Coque à onglets (ajout 2026-11-24) */
+#gg-coque { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#gg-coque > .cl-barre { margin: .5rem 1rem; flex: none; }
+#gg-coque > .cl-message { flex: none; padding: 0 1rem; }
+#gg-coque > .cl-section[data-cl-section="vue"]:not([hidden]) { flex: 1; min-height: 0; display: flex; }
+#gg-coque > .cl-section[data-cl-section="vue"] > .gg-cadre { flex: 1; }
+#gg-coque > .cl-section:not([data-cl-section="vue"]):not([hidden]) { padding: 0 1rem 1rem; overflow-y: auto; }

@@ -586,9 +586,16 @@
   }
 
   function rendrePanneau() {
-    if (etat.configOuverte) etat.panneau = 'reglages';
     var x = etat.selection ? parId[etat.selection] : null;
-    panneau.innerHTML = etat.panneau === 'reglages' ? vueReglages() : (etat.panneau === 'fiche' && x) ? vueFiche(x) : vueFiltres();
+    panneau.innerHTML = (etat.panneau === 'fiche' && x) ? vueFiche(x) : vueFiltres();
+  }
+  // Les réglages vivent dans l'onglet Réglages, hors du panneau.
+  var zoneReg = document.createElement('div');
+  zoneReg.id = 'gg-reglages-zone';
+  function rendreReglages() { if (zoneReg) zoneReg.innerHTML = vueReglages(); }
+  function rafraichirReglages() {
+    if (configLab && configLab.estModifie()) return;
+    etat.brouillon = null; rendreReglages();
   }
   var pageAppliquee = '';
   function appliquerPage() {
@@ -601,12 +608,12 @@
       if (cible.pied) cible.pied.id = 'pied';
     }
   }
-  function rendre() { appliquerPage(); rendrePanneau(); rendreVue(); }
+  function rendre() { appliquerPage(); rendrePanneau(); monterCoque(); rafraichirReglages(); rendreVue(); }
   // Une mise à jour venue de Grist pendant une saisie dans le panneau attend la fin de la saisie.
   var rendreApres = false;
   function rendreSiLibre() {
     var a = document.activeElement;
-    if (a && panneau.contains(a) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) { rendreApres = true; rendreVue(); return; }
+    if (a && (panneau.contains(a) || zoneReg.contains(a)) && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) { rendreApres = true; rendreVue(); return; }
     rendre();
   }
   panneau.addEventListener('focusout', function (e) {
@@ -655,20 +662,21 @@
     o[c[c.length - 1]] = v;
   }
 
-  panneau.addEventListener('click', function (e) {
+  function ecouter(ev, fn) { panneau.addEventListener(ev, fn); zoneReg.addEventListener(ev, fn); }
+  ecouter('click', function (e) {
     var el = e.target.closest('button');
     if (!el || el.disabled) return;
     var a = el.getAttribute('data-action');
     if (el.hasAttribute('data-acteur')) { selectionner(el.getAttribute('data-acteur'), true); return; }
-    if (a === 'retour') { var ancien = etat.selection; etat.brouillon = null; selectionner(null); var b = panneau.querySelector('[data-acteur="' + ancien + '"]'); if (b) b.focus(); return; }
+    if (a === 'retour') { var ancien = etat.selection; selectionner(null); var b = panneau.querySelector('[data-acteur="' + ancien + '"]'); if (b) b.focus(); return; }
     if (a === 'effacer-chemin') { etat.chemin = null; etat.cheminVers = ''; rendre(); return; }
     if (a === 'annuler') { etat.brouillon = null; etat.panneau = etat.selection ? 'fiche' : 'liste'; rendre(); return; }
     if (a === 'ajouter-participation') {
       var t = meta.tables.filter(function (x) { return x !== etat.brouillon.liens; })[0];
       etat.brouillon.participations.push({ table: t, membres: (meta.colonnes[t][0] || {}).colId, groupe: '', libelle: 'Participation commune' });
-      rendrePanneau(); return;
+      rendreReglages(); if (configLab) configLab.modifie(true); return;
     }
-    if (el.hasAttribute('data-retirer-participation')) { etat.brouillon.participations.splice(num(el.getAttribute('data-retirer-participation')), 1); rendrePanneau(); return; }
+    if (el.hasAttribute('data-retirer-participation')) { etat.brouillon.participations.splice(num(el.getAttribute('data-retirer-participation')), 1); rendreReglages(); if (configLab) configLab.modifie(true); return; }
     if (a === 'enregistrer') {
       var o = etat.brouillon;
       enregistrerOptions(o).then(function () {
@@ -681,7 +689,7 @@
     if (a === 'creer-liens') { creerTableLiens(); return; }
     if (el.hasAttribute('data-supprimer-lien')) { ecrire([['RemoveRecord', options.liens, num(el.getAttribute('data-supprimer-lien'))]], 'Lien supprimé.'); }
   });
-  panneau.addEventListener('change', function (e) {
+  ecouter('change', function (e) {
     var el = e.target;
     if (el.hasAttribute('data-cat')) { etat.masquesCat[el.getAttribute('data-cat')] = !el.checked; rendre(); var x = document.getElementById(el.id); if (x) x.focus(); return; }
     if (el.hasAttribute('data-lien')) { etat.masquesLien[el.getAttribute('data-lien')] = !el.checked; rendre(); var y = document.getElementById(el.id); if (y) y.focus(); return; }
@@ -694,18 +702,18 @@
       var t = el.getAttribute('data-table-acteur'), b = etat.brouillon;
       if (el.checked) b.acteurs.push({ table: t, nom: colonne(t, 'Nom') ? 'Nom' : ((meta.colonnes[t][0] || {}).colId || ''), type: colonne(t, 'Type') ? 'Type' : '', libelle: t });
       else b.acteurs = b.acteurs.filter(function (x) { return x.table !== t; });
-      rendrePanneau(); var w = document.getElementById(el.id); if (w) w.focus(); return;
+      rendreReglages(); if (configLab) configLab.modifie(true); var w = document.getElementById(el.id); if (w) w.focus(); return;
     }
     if (el.hasAttribute('data-reglage')) {
       majBrouillon(el);
       if (/^participations\.\d+\.table$/.test(el.getAttribute('data-reglage'))) {
         var p = etat.brouillon.participations[num(cheminReglage(el)[1])];
         p.membres = ((meta.colonnes[p.table] || [])[0] || {}).colId; p.groupe = '';
-        rendrePanneau();
+        rendreReglages(); if (configLab) configLab.modifie(true);
       }
     }
   });
-  panneau.addEventListener('input', function (e) {
+  ecouter('input', function (e) {
     if (e.target.hasAttribute('data-reglage') && e.target.type !== 'checkbox' && e.target.tagName === 'INPUT') majBrouillon(e.target);
   });
   panneau.addEventListener('toggle', function (e) {
@@ -765,58 +773,43 @@
     b.addEventListener('click', function () { etat.vue = b.getAttribute('data-vue'); rendreVue(); });
   });
   document.getElementById('gg-reorganiser').addEventListener('click', function () { positions = {}; rendreVue(); });
-  // Page de configuration unique : le panneau de réglages existant est déplacé dans un onglet.
-  var configLab = null, zoneConfig = document.getElementById('gg-config');
-  var coteConfig = document.querySelector('.gg-cote'), cadreConfig = document.querySelector('.gg-cadre');
-  function fermerConfig() {
-    etat.configOuverte = false; etat.brouillon = null; etat.alerte = null; etat.panneau = etat.selection ? 'fiche' : 'liste';
-    coteConfig.insertBefore(panneau, coteConfig.querySelector('.gg-pied'));
-    zoneConfig.hidden = true; zoneConfig.innerHTML = ''; configLab = null;
-    cadreConfig.style.display = '';
-    rendre();
-  }
-  function ouvrirConfig() {
-    if (!zoneConfig || !window.ConfigLab) return;
-    etat.configOuverte = true; etat.brouillon = null; etat.alerte = null;
-    rendrePanneau();
-    var pageEditee = etat.brouillon.page = etat.brouillon.page || { marque: '', titre: 'Liens entre acteurs', pied: { accessibilite: '' } };
-    cadreConfig.style.display = 'none';
-    zoneConfig.hidden = false;
+  // Coque à onglets : la vue (graphe, positions, liste), les réglages, l'en-tête et le pied, l'aperçu, la publication.
+  var configLab = null, zoneConfig = document.getElementById('gg-coque'), pageEditee = null;
+  function monterCoque() {
+    if (configLab || !zoneConfig || !window.ConfigLab) return;
+    pageEditee = JSON.parse(JSON.stringify(options.page || { marque: '', titre: 'Liens entre acteurs', pied: { accessibilite: '' } }));
     configLab = window.ConfigLab.monter(zoneConfig, {
-      nom: 'Configuration du graphe',
-      libelleAnnuler: 'Fermer',
+      nom: 'Liens entre acteurs',
+      vue: { libelle: 'Graphe', element: document.querySelector('.gg-cadre') },
       page: pageEditee,
       onglets: [{ id: 'reglages', libelle: 'Réglages', rendre: function (zone) {
-        var w = document.createElement('div'); w.className = 'cl-panneau'; w.appendChild(panneau); zone.appendChild(w);
+        zone.innerHTML = '<div class="cl-panneau"></div>'; zone.firstChild.appendChild(zoneReg); rendreReglages();
       } }],
       apercu: function (zone) {
-        zone.innerHTML = '<h1 class="fr-h3">' + esc((etat.brouillon && etat.brouillon.titre) || 'Liens entre acteurs') + '</h1><p class="fr-text--sm">Le graphe, les positions et la liste s\'affichent entre l\'en-tête et le pied de page.</p>';
+        zone.innerHTML = '<h1 class="fr-h3">' + esc((etat.brouillon && etat.brouillon.titre) || options.titre || 'Liens entre acteurs') + '</h1><p class="fr-text--sm">Le graphe, les positions et la liste s\'affichent entre l\'en-tête et le pied de page.</p>';
       },
       publication: { mode: 'connecte', adresseWidget: location.href.split('#')[0].split('?')[0], texte: 'Si le document est partagé en lecture par lien public, le graphe s\'affiche aussi pour les personnes qui ont ce lien, sans compte.' },
+      // La vue est masquée hors de son onglet : on évite de dessiner dans un conteneur sans taille.
+      surOnglet: function (id) { etat.configOuverte = id !== 'vue'; if (id === 'vue') { setTimeout(function () { rendreVue(); if (graphe) graphe.resize(); }, 50); } },
       surEnregistrer: function () {
-        if (!etat.brouillon) rendrePanneau();
+        if (!etat.brouillon) rendreReglages();
         etat.brouillon.page = pageEditee;
-        var bouton = panneau.querySelector('[data-action="enregistrer"]');
+        var bouton = zoneReg.querySelector('[data-action="enregistrer"]');
         if (!bouton) return;
         etat.alerte = null;
         bouton.click();
         var essais = 0;
         (function attendre() {
           if (!configLab) return;
-          if (etat.alerte && etat.alerte.type === 'success') { configLab.enregistre(); return; }
+          if (etat.alerte && etat.alerte.type === 'success') { configLab.enregistre(); configLab.message('success', etat.alerte.texte); return; }
           if (etat.alerte && etat.alerte.type === 'error') { configLab.message('error', etat.alerte.texte); return; }
           if (++essais < 25) setTimeout(attendre, 400);
         })();
-      },
-      surAnnuler: fermerConfig
+      }
     });
   }
-  var boutonConfigurer = document.getElementById('gg-configurer');
-  if (boutonConfigurer) boutonConfigurer.addEventListener('click', ouvrirConfig);
-  document.getElementById('gg-reglages').addEventListener('click', function () {
-    etat.panneau = 'reglages'; etat.brouillon = null; etat.alerte = null; rendrePanneau();
-    var t = document.getElementById('gg-reglages-titre'); if (t) t.focus();
-  });
+  function ouvrirReglages() { monterCoque(); if (configLab) configLab.onglet('reglages'); }
+  document.getElementById('gg-reglages').addEventListener('click', ouvrirReglages);
   document.getElementById('gg-actualiser').addEventListener('click', function () { charger().then(rendre); });
 
   // ---------------------------------------------------------------------------
@@ -864,7 +857,7 @@
   } else {
     source = sourceGrist();
     var attente = null, pret = false;
-    grist.ready({ requiredAccess: 'full', allowSelectBy: true, onEditOptions: function () { document.getElementById('gg-reglages').click(); } });
+    grist.ready({ requiredAccess: 'full', allowSelectBy: true, onEditOptions: function () { ouvrirReglages(); } });
     grist.onOptions(function (o) {
       optionsBrutes = o || {};
       clearTimeout(attente);
