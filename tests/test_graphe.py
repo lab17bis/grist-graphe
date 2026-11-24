@@ -42,7 +42,7 @@ with sync_playwright() as p:
     # Positions
     pg.locator('[data-vue=positions]').click(); pg.wait_for_timeout(300)
     verifier('vue positions', '19 acteurs positionnés' in pg.locator('#gg-info').inner_text())
-    pg.locator('[data-action=retour]').click(); pg.fill('#gg-q', 'ROUX Inès'); pg.locator('form[data-form=trouver] button').click()
+    pg.locator('#gg-panneau [data-action=retour]').click(); pg.fill('#gg-q', 'ROUX Inès'); pg.locator('form[data-form=trouver] button').click()
     pg.select_option('#gg-n-Influence', '4'); pg.select_option('#gg-n-Interet', '2')
     verifier('positionner un acteur', '20 acteurs positionnés' in pg.locator('#gg-info').inner_text())
     # Liste
@@ -50,11 +50,12 @@ with sync_playwright() as p:
     verifier('vue liste : tableaux des acteurs et des liens', pg.locator('#gg-liste table').count() == 2 and pg.locator('#gg-liste tbody tr').count() == 28 + 78)
     pg.locator('[data-vue=graphe]').click()
     # Réglages
-    pg.locator('#gg-reglages').click(); pg.wait_for_selector('#gg-reglages-titre')
+    pg.locator('#gg-reglages').click(); pg.wait_for_selector('#gg-reglages-titre', state='attached')
     pg.select_option('#rg-couleur', 'type'); pg.select_option('#rg-taille', 'influence')
     pg.get_by_role('button', name='Retirer').click()
-    pg.get_by_role('button', name='Enregistrer').click()
-    pg.locator('[data-action=retour]').click()
+    pg.get_by_role('button', name='Enregistrer').click(); pg.wait_for_timeout(500)
+    pg.locator('.cl-barre label').first.click(); pg.wait_for_timeout(900)
+    if pg.locator('#gg-panneau [data-action=retour]').count(): pg.locator('#gg-panneau [data-action=retour]').click()
     verifier('réglages : couleur par type, sans participation', etat()['options']['couleurPar'] == 'type' and etat()['aretes'] == 33 and pg.locator('.gg-legende-types li').count() >= 5)
     pg.screenshot(path='/tmp/graphe-type.png')
     pg.set_viewport_size({'width': 400, 'height': 800}); pg.wait_for_timeout(300); pg.screenshot(path='/tmp/graphe-mobile.png', full_page=True)

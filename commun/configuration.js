@@ -10,7 +10,8 @@
  *   options.onglets       : [{ id, libelle, rendre(zone) }] réglages propres à l'outil, affichés après la vue
  *   options.apercu        : facultatif, function (zone, page) : montre un échantillon de l'outil sous l'en-tête
  *   options.publication   : { mode: "connecte" | "public", lien, adresseWidget, texte,
- *                             publier: { lienDoc, construire(lienDoc) -> adresse, surChangement(lienDoc), texte } }
+ *                             publier: { lienDoc, champs: [{ libelle, aide, exemple, valeur, type: "texte" | "case" }], construire(lienDoc) -> adresse,
+ *                                       surChangement(lienDoc, champs), texte } }
  *   options.surEnregistrer: function () : à appeler quand la personne clique sur Enregistrer
  *   options.surAnnuler    : facultatif
  *   options.libelleAnnuler: facultatif, texte du bouton secondaire (« Annuler » par défaut, par exemple « Fermer »)
@@ -49,6 +50,13 @@
       "<div class=\"fr-input-group\"><label class=\"fr-label\" for=\"" + id + "-doc\">Lien du document Grist partagé en lecture publique" +
       "<span class=\"fr-hint-text\">Dans Grist : Partager, puis « Accès public » en lecture seule, puis copiez le lien.</span></label>" +
       "<input class=\"fr-input cl-code\" id=\"" + id + "-doc\" value=\"" + esc(pb.lienDoc || "") + "\" placeholder=\"https://docs.getgrist.com/…\"></div>" +
+      (pb.champs || []).map(function (c, i) {
+        if (c.type === "case") {
+          return "<div class=\"fr-checkbox-group fr-mb-2w\"><input type=\"checkbox\" id=\"" + id + "-ch" + i + "\"" + (c.valeur ? " checked" : "") + "><label class=\"fr-label\" for=\"" + id + "-ch" + i + "\">" + esc(c.libelle) + (c.aide ? "<span class=\"fr-hint-text\">" + esc(c.aide) + "</span>" : "") + "</label></div>";
+        }
+        return "<div class=\"fr-input-group\"><label class=\"fr-label\" for=\"" + id + "-ch" + i + "\">" + esc(c.libelle) + (c.aide ? "<span class=\"fr-hint-text\">" + esc(c.aide) + "</span>" : "") + "</label>" +
+          "<input class=\"fr-input cl-code\" id=\"" + id + "-ch" + i + "\" value=\"" + esc(c.valeur || "") + "\"" + (c.exemple ? " placeholder=\"" + esc(c.exemple) + "\"" : "") + "></div>";
+      }).join("") +
       "<div id=\"" + id + "-resultat\"></div>";
   }
   function resultatPublier(zone, pb, id) {
@@ -64,12 +72,17 @@
     if (!pub || !pub.publier) { return; }
     var champ = zone.querySelector("#" + id + "-doc");
     resultatPublier(zone, pub.publier, id);
-    if (champ) { champ.addEventListener("input", function () {
-      pub.publier.lienDoc = champ.value.trim();
-      if (pub.publier.surChangement) { pub.publier.surChangement(pub.publier.lienDoc); }
+    function changement() {
+      if (pub.publier.surChangement) { pub.publier.surChangement(pub.publier.lienDoc, pub.publier.champs); }
       resultatPublier(zone, pub.publier, id);
       if (modifie) { modifie(true); }
-    }); }
+    }
+    if (champ) { champ.addEventListener("input", function () { pub.publier.lienDoc = champ.value.trim(); changement(); }); }
+    (pub.publier.champs || []).forEach(function (c, i) {
+      var n = zone.querySelector("#" + id + "-ch" + i);
+      if (n && c.type === "case") { n.addEventListener("change", function () { c.valeur = n.checked; changement(); }); }
+      else if (n) { n.addEventListener("input", function () { c.valeur = n.value.trim(); changement(); }); }
+    });
   }
 
   function publicationHtml(pub, id) {

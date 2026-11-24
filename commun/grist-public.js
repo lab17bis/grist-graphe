@@ -21,7 +21,8 @@
   "use strict";
 
   var P = new URLSearchParams(global.location.search);
-  var actif = P.get("public") === "1" && !!P.get("doc");
+  var aDoc = !!P.get("doc");
+  var actif = P.get("public") === "1" && aDoc;
 
   function decoder(s) {
     try {
@@ -62,7 +63,7 @@
     return String(adressePage).split("?")[0].split("#")[0] + "?" + q.toString();
   }
 
-  if (!actif) {
+  if (!aDoc) {
     global.GristPublic = { actif: false, lien: lien, encoder: encoder, decoder: decoder, analyserLien: analyserLien };
     return;
   }
@@ -81,7 +82,7 @@
     b.classList.add("gp-public");
     if (integre) { b.classList.add("gp-integre"); }
   }
-  classer();
+  if (aDoc) { classer(); }
 
   function json(r) {
     if (!r.ok) { throw new Error("Lecture impossible (erreur " + r.status + "). Le document est-il partagé en lecture publique ?"); }
@@ -239,9 +240,17 @@
 
   if (!cible) { document.addEventListener("DOMContentLoaded", function () { afficherErreur(new Error("Adresse du document Grist non reconnue.")); }); }
 
-  global.grist = grist;
+  if (actif) { global.grist = grist; }
   global.GristPublic = {
-    actif: true, table: table, integre: integre, config: cfg, base: cible && cible.base,
+    actif: actif, table: table, integre: integre, config: cfg, base: cible && cible.base, params: P,
+    // Pages publiques dédiées : lecture directe des tables et des réglages enregistrés dans le document.
+    lireTable: function (nom) { return tableEnColonnes(nom).then(lignes); },
+    lireConfig: function (nomTable, nomColonne) {
+      return rest("/tables/" + encodeURIComponent(nomTable) + "/columns").then(function (r) {
+        var c = r.columns.filter(function (x) { return x.id === nomColonne; })[0];
+        try { return c && c.fields.description ? JSON.parse(c.fields.description) : {}; } catch (e) { return {}; }
+      });
+    },
     lien: lien, encoder: encoder, decoder: decoder, analyserLien: analyserLien
   };
 })(window);
