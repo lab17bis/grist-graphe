@@ -27,7 +27,8 @@
     ['Informer', 'Influence faible, intérêt fort'], ['Surveiller', 'Influence faible, intérêt faible']];
   var COLONNES_TECHNIQUES = /^(id|manualSort|gristHelper_.*|Config_.*|Influence|Interet|Latitude|Longitude)$/;
 
-  var DEMO = window.self === window.top;
+  var PUBLIC = !!(window.GristPublic && window.GristPublic.actif);
+  var DEMO = window.self === window.top && !PUBLIC;
   var options = {};
   var optionsBrutes = {};            // réglages enregistrés avec le widget
   var source = null;                 // accès aux données : Grist ou démonstration
@@ -788,12 +789,19 @@
       apercu: function (zone) {
         zone.innerHTML = '<h1 class="fr-h3">' + esc((etat.brouillon && etat.brouillon.titre) || options.titre || 'Liens entre acteurs') + '</h1><p class="fr-text--sm">Le graphe, les positions et la liste s\'affichent entre l\'en-tête et le pied de page.</p>';
       },
-      publication: { mode: 'connecte', adresseWidget: location.href.split('#')[0].split('?')[0], texte: 'Si le document est partagé en lecture par lien public, le graphe s\'affiche aussi pour les personnes qui ont ce lien, sans compte.' },
+      publication: { mode: 'connecte', adresseWidget: location.href.split('#')[0].split('?')[0],
+        publier: { lienDoc: (optionsBrutes.publication && optionsBrutes.publication.lienDoc) || '', texte: 'Le graphe peut s\'afficher en page complète, sans compte Grist, en lecture seule : graphe, fiches, chemins et liste.',
+          construire: function (l) {
+            var o = JSON.parse(JSON.stringify((etat.brouillon || optionsBrutes) || {})); delete o.publication; o.page = pageEditee;
+            return window.GristPublic ? window.GristPublic.lien(location.href.split('#')[0].split('?')[0], { doc: l, table: meta.tableCourante, options: o }) : null;
+          },
+          surChangement: function (l) { if (!etat.brouillon) rendreReglages(); if (etat.brouillon) etat.brouillon.publication = { lienDoc: l }; } } },
       // La vue est masquée hors de son onglet : on évite de dessiner dans un conteneur sans taille.
       surOnglet: function (id) { etat.configOuverte = id !== 'vue'; if (id === 'vue') { setTimeout(function () { rendreVue(); if (graphe) graphe.resize(); }, 50); } },
       surEnregistrer: function () {
         if (!etat.brouillon) rendreReglages();
         etat.brouillon.page = pageEditee;
+        etat.brouillon.publication = etat.brouillon.publication || optionsBrutes.publication || { lienDoc: '' };
         var bouton = zoneReg.querySelector('[data-action="enregistrer"]');
         if (!bouton) return;
         etat.alerte = null;

@@ -89,3 +89,15 @@ body { background: var(--background-default-grey); color: var(--text-default-gre
 #gg-coque > .cl-section[data-cl-section="vue"]:not([hidden]) { flex: 1; min-height: 0; display: flex; }
 #gg-coque > .cl-section[data-cl-section="vue"] > .gg-cadre { flex: 1; }
 #gg-coque > .cl-section:not([data-cl-section="vue"]):not([hidden]) { padding: 0 1rem 1rem; overflow-y: auto; }
+
+/* Page publique : lecture seule, aucune commande d'écriture. */
+.gp-public [data-supprimer-lien],
+.gp-public [data-retirer-participation],
+.gp-public [data-action="ajouter-participation"],
+.gp-public [data-action="ajouter-colonnes"],
+.gp-public [data-action="creer-liens"],
+.gp-public .gg-encart,
+.gp-public details:has([data-form="lien"]),
+.gp-public .fr-select-group:has([data-note]) {
+  display: none !important;
+}

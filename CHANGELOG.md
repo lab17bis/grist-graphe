@@ -2,6 +2,14 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-24 (page publique)
+
+### Ajouté
+- Page publique en lecture seule : le graphe, les fiches, les chemins et la liste. L'adresse `index.html?public=1&doc=<lien du document Grist>&table=<table>` affiche l'outil en pleine page, sans compte Grist, avec l'en-tête et le pied de page DSFR configurés ; aucune commande d'écriture n'est proposée.
+- Onglet Publication : saisissez le lien du document Grist partagé en lecture publique, l'outil construit le lien de la page publique (réglages et association des colonnes compris), à copier ou à ouvrir. Le lien du document est enregistré avec les réglages.
+- Option `integre=1` : la page s'affiche sans en-tête ni pied propres, pour être intégrée dans un autre site.
+- Module commun `commun/grist-public.js` (et `.css`) : lit le document par l'API REST de Grist, en lecture seule.
+
 ## 2026-11-24 (documentation)
 
 ### Modifié
