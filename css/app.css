@@ -78,3 +78,7 @@ body { background: var(--background-default-grey); color: var(--text-default-gre
 .gg-reglage-cols { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; margin-top: .5rem; }
 .gg-reglage-cols .fr-select-group, .gg-reglage-cols .fr-input-group { margin: 0; }
 .gg-liste-vue .fr-table { margin-bottom: 1rem; }
+
+/* Page de configuration unique : on masque ce que la barre de configuration fait déjà (ajout 2026-11-24) */
+.cl-config .gg-retour, .cl-config #gg-reglages-titre, .cl-config .gg-actions-reglages { display: none; }
+.cl-config .gg-panneau { overflow: visible; }

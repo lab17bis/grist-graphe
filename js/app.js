@@ -404,6 +404,7 @@
   }
 
   function rendreVue() {
+    if (etat.configOuverte) return;   // la vue est masquée pendant la configuration
     document.querySelectorAll('[data-vue]').forEach(function (b) { var actif = b.getAttribute('data-vue') === etat.vue; b.classList.toggle('fr-btn--secondary', !actif); b.setAttribute('aria-pressed', String(actif)); });
     var zone = document.getElementById('gg-graphe'), liste = document.getElementById('gg-liste'), info = document.getElementById('gg-info');
     info.innerHTML = '';
@@ -415,7 +416,7 @@
         var id = p.data && p.data.id;
         if (id && parId[id]) selectionner(id, true);
       });
-      window.addEventListener('resize', function () { graphe.resize(); });
+      window.addEventListener('resize', function () { if (!etat.configOuverte) graphe.resize(); });
     }
     if (etat.vue === 'positions') {
       var avec = acteurs.filter(function (x) { return x.influence !== null && x.interet !== null; }).length;
@@ -580,15 +581,27 @@
       '<div class="fr-select-group"><label class="fr-label" for="rg-taille">Taille des acteurs</label><select class="fr-select fr-select--sm" id="rg-taille" data-reglage="taillePar"><option value="liens"' + (b.taillePar === 'liens' ? ' selected' : '') + '>Selon le nombre de liens</option><option value="influence"' + (b.taillePar === 'influence' ? ' selected' : '') + '>Selon l\'influence</option></select></div>' +
       '<div class="fr-checkbox-group fr-checkbox-group--sm"><input type="checkbox" id="rg-etiq" data-reglage="etiquettes"' + (b.etiquettes ? ' checked' : '') + '><label class="fr-label" for="rg-etiq">Afficher tous les noms</label></div>' +
       '<div class="fr-checkbox-group fr-checkbox-group--sm"><input type="checkbox" id="rg-iso" data-reglage="masquerIsoles"' + (b.masquerIsoles ? ' checked' : '') + '><label class="fr-label" for="rg-iso">Masquer les acteurs sans lien</label></div>' +
-      '<ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--sm fr-mt-3w"><li><button type="button" class="fr-btn" data-action="enregistrer">Enregistrer</button></li><li><button type="button" class="fr-btn fr-btn--secondary" data-action="annuler">Annuler</button></li></ul>';
+      '<ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--sm fr-mt-3w gg-actions-reglages"><li><button type="button" class="fr-btn" data-action="enregistrer">Enregistrer</button></li><li><button type="button" class="fr-btn fr-btn--secondary" data-action="annuler">Annuler</button></li></ul>';
     return h;
   }
 
   function rendrePanneau() {
+    if (etat.configOuverte) etat.panneau = 'reglages';
     var x = etat.selection ? parId[etat.selection] : null;
     panneau.innerHTML = etat.panneau === 'reglages' ? vueReglages() : (etat.panneau === 'fiche' && x) ? vueFiche(x) : vueFiltres();
   }
-  function rendre() { rendrePanneau(); rendreVue(); }
+  var pageAppliquee = '';
+  function appliquerPage() {
+    var p = options && options.page, sig = JSON.stringify(p || null);
+    if (sig === pageAppliquee) return;
+    pageAppliquee = sig;
+    if (window.PageDSFR && p && (p.titre || p.marque)) {
+      var cible = window.PageDSFR.appliquer(p, { entete: document.getElementById('entete'), pied: document.getElementById('pied') });
+      if (cible.entete) cible.entete.id = 'entete';
+      if (cible.pied) cible.pied.id = 'pied';
+    }
+  }
+  function rendre() { appliquerPage(); rendrePanneau(); rendreVue(); }
   // Une mise à jour venue de Grist pendant une saisie dans le panneau attend la fin de la saisie.
   var rendreApres = false;
   function rendreSiLibre() {
@@ -752,6 +765,54 @@
     b.addEventListener('click', function () { etat.vue = b.getAttribute('data-vue'); rendreVue(); });
   });
   document.getElementById('gg-reorganiser').addEventListener('click', function () { positions = {}; rendreVue(); });
+  // Page de configuration unique : le panneau de réglages existant est déplacé dans un onglet.
+  var configLab = null, zoneConfig = document.getElementById('gg-config');
+  var coteConfig = document.querySelector('.gg-cote'), cadreConfig = document.querySelector('.gg-cadre');
+  function fermerConfig() {
+    etat.configOuverte = false; etat.brouillon = null; etat.alerte = null; etat.panneau = etat.selection ? 'fiche' : 'liste';
+    coteConfig.insertBefore(panneau, coteConfig.querySelector('.gg-pied'));
+    zoneConfig.hidden = true; zoneConfig.innerHTML = ''; configLab = null;
+    cadreConfig.style.display = '';
+    rendre();
+  }
+  function ouvrirConfig() {
+    if (!zoneConfig || !window.ConfigLab) return;
+    etat.configOuverte = true; etat.brouillon = null; etat.alerte = null;
+    rendrePanneau();
+    var pageEditee = etat.brouillon.page = etat.brouillon.page || { marque: '', titre: 'Liens entre acteurs', pied: { accessibilite: '' } };
+    cadreConfig.style.display = 'none';
+    zoneConfig.hidden = false;
+    configLab = window.ConfigLab.monter(zoneConfig, {
+      nom: 'Configuration du graphe',
+      libelleAnnuler: 'Fermer',
+      page: pageEditee,
+      onglets: [{ id: 'reglages', libelle: 'Réglages', rendre: function (zone) {
+        var w = document.createElement('div'); w.className = 'cl-panneau'; w.appendChild(panneau); zone.appendChild(w);
+      } }],
+      apercu: function (zone) {
+        zone.innerHTML = '<h1 class="fr-h3">' + esc((etat.brouillon && etat.brouillon.titre) || 'Liens entre acteurs') + '</h1><p class="fr-text--sm">Le graphe, les positions et la liste s\'affichent entre l\'en-tête et le pied de page.</p>';
+      },
+      publication: { mode: 'connecte', adresseWidget: location.href.split('#')[0].split('?')[0], texte: 'Si le document est partagé en lecture par lien public, le graphe s\'affiche aussi pour les personnes qui ont ce lien, sans compte.' },
+      surEnregistrer: function () {
+        if (!etat.brouillon) rendrePanneau();
+        etat.brouillon.page = pageEditee;
+        var bouton = panneau.querySelector('[data-action="enregistrer"]');
+        if (!bouton) return;
+        etat.alerte = null;
+        bouton.click();
+        var essais = 0;
+        (function attendre() {
+          if (!configLab) return;
+          if (etat.alerte && etat.alerte.type === 'success') { configLab.enregistre(); return; }
+          if (etat.alerte && etat.alerte.type === 'error') { configLab.message('error', etat.alerte.texte); return; }
+          if (++essais < 25) setTimeout(attendre, 400);
+        })();
+      },
+      surAnnuler: fermerConfig
+    });
+  }
+  var boutonConfigurer = document.getElementById('gg-configurer');
+  if (boutonConfigurer) boutonConfigurer.addEventListener('click', ouvrirConfig);
   document.getElementById('gg-reglages').addEventListener('click', function () {
     etat.panneau = 'reglages'; etat.brouillon = null; etat.alerte = null; rendrePanneau();
     var t = document.getElementById('gg-reglages-titre'); if (t) t.focus();
