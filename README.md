@@ -103,7 +103,7 @@ Ce widget est assemblé, avec d'autres, dans des **espaces** : des documents Gri
 - [grist-projet](https://github.com/lab17bis/grist-projet) : espace d'équipe pour gérer des projets.
 - [grist-reunion](https://github.com/lab17bis/grist-reunion) : réunions : ordre du jour, séance, compte rendu et suivi des actions.
 - [grist-management](https://github.com/lab17bis/grist-management) : écran de management visuel d'équipe.
-- [grist-decision](https://github.com/lab17bis/grist-decision) : consultations : boîte à idées, valorisation des réalisations, votes et suites données.
+- [grist-consultation](https://github.com/lab17bis/grist-consultation) : consultations : boîte à idées, valorisation des réalisations, votes et suites données.
 - [grist-carte](https://github.com/lab17bis/grist-carte) : carte interactive des lignes d'une table, au fond de l'IGN.
 
 Les widgets qui ont un en-tête et un pied de page partagent les mêmes réglages.
