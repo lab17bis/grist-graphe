@@ -13,7 +13,10 @@ body { background: var(--background-default-grey); color: var(--text-default-gre
 .gg-principal { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 .gg-barre { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .5rem; padding: .5rem 1rem; border-bottom: 1px solid var(--border-default-grey); }
 .gg-vues { display: flex; gap: .5rem; }
-.gg-vues .fr-btn, .gg-barre > .fr-btn { margin: 0; }
+.gg-vues .fr-btn, .gg-barre > .fr-btn, .gg-mouvement .fr-btn { margin: 0; }
+.gg-mouvement { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem; margin-left: auto; }
+.gg-statut { margin: 0 .5rem 0 0; color: var(--text-mention-grey); }
+.gg-statut:empty { display: none; }
 .gg-graphe { flex: 1; min-height: 20rem; }
 .gg-liste { flex: 1; overflow: auto; padding: 1rem; }
 .gg-info:empty { display: none; }
@@ -101,3 +104,10 @@ body { background: var(--background-default-grey); color: var(--text-default-gre
 .gp-public .fr-select-group:has([data-note]) {
   display: none !important;
 }
+
+/* Analyse du réseau : groupes à mettre en avant (ajout 2026-11-25) */
+.gg-analyse .fr-select-group { margin-bottom: .5rem; }
+.gg-analyse .fr-select-group .fr-label { display: block; }
+.gg-groupes { margin: 0; }
+.gg-groupes .fr-tag { max-width: 100%; }
+.gg-groupes .gg-pastille { margin-right: .25rem; width: .75rem; height: .75rem; }

@@ -2,6 +2,24 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-25 (graphe en mouvement et analyse du réseau)
+
+### Ajouté
+- Bouton « Animer » au-dessus du graphe : les acteurs se placent sous vos yeux, les liens se tendent puis se stabilisent ; le mouvement s'arrête seul quand plus rien ne bouge. En mouvement, déplacer un acteur fait réagir les autres. « Figer » garde la disposition obtenue.
+- Panneau « Analyse du réseau » :
+  - « Regrouper les acteurs » : par proximité (communautés détectées automatiquement, méthode de Louvain pondérée par la force des liens), selon la table ou selon le type. Les acteurs d'un même groupe se rassemblent et prennent la couleur du groupe ; les liens entre groupes s'allongent.
+  - Chaque groupe peut être mis en avant d'un clic : il vient au centre, se resserre, et les autres acteurs s'écartent et s'estompent.
+  - « Taille des acteurs » : selon le nombre de liens, le rôle de passerelle (acteurs par qui passent beaucoup de chemins entre les autres) ou l'influence.
+- Vue Liste : colonne « Groupe » quand un regroupement est choisi.
+- Réglages : « Regroupement à l'ouverture » et taille « selon le rôle de passerelle ». Chaque personne peut changer ces choix pour elle-même dans le panneau, sans toucher aux réglages enregistrés.
+
+### Amélioré
+- Un acteur déplacé à la main garde sa place.
+- La disposition tient compte de la force des liens : un lien fort rapproche davantage.
+
+### Accessibilité
+- Si l'appareil demande moins d'animations (réglage « réduire les animations »), la disposition est calculée d'un coup, sans mouvement. L'état du mouvement est annoncé aux lecteurs d'écran.
+
 ## 2026-11-25 (aperçu réel)
 
 ### Amélioré

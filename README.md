@@ -14,6 +14,8 @@ Tout se règle dans Grist, sans toucher au code. Le dépôt ne contient que le c
 | **Positions** | La matrice influence / intérêt des parties prenantes : associer étroitement, satisfaire, informer, surveiller |
 | **Liste** | Les acteurs (du plus au moins connecté) et tous les liens en tableaux : l'alternative accessible au graphe |
 | **Filtres** | Par catégorie d'acteurs et par nature de lien ; les acteurs les plus connectés et les acteurs isolés |
+| **Mouvement** | *Animer* : les acteurs se placent sous vos yeux et se stabilisent ; déplacer un acteur fait réagir les autres. *Figer* garde la disposition. Sans mouvement si l'appareil demande moins d'animations |
+| **Analyse du réseau** | Regrouper les acteurs par proximité (communautés détectées automatiquement), par table ou par type ; mettre un groupe en avant d'un clic (il vient au centre, les autres s'écartent) ; taille selon le nombre de liens, le rôle de passerelle ou l'influence |
 
 Les liens viennent de trois sources, que l'on peut combiner :
 
@@ -37,7 +39,7 @@ Les réglages sont enregistrés **avec le widget** (propres à la vue) :
 
 - **Tables d'acteurs** : pour chacune, la colonne du nom, la colonne du type et un libellé (« Structures », « Personnes »…). Chaque table a sa forme : carré arrondi, rond, losange, triangle.
 - **Table des liens**, **rattachements** (oui ou non) et **sources de participation commune** : table, colonne qui cite les acteurs (référence multiple, liste de choix ou texte séparé par des virgules), regroupement facultatif. Une source peut ne retenir que certaines lignes : dans les options du widget, `"condition": { "colonne": "Type", "operateur": "different", "valeur": "Plénière" }` écarte par exemple les plénières, où tout le monde se croise.
-- **Affichage** : couleur selon la table ou selon le type, taille selon le nombre de liens ou l'influence, noms toujours affichés, acteurs isolés masqués.
+- **Affichage** : couleur selon la table ou selon le type, taille selon le nombre de liens, le rôle de passerelle ou l'influence, regroupement à l'ouverture (aucun, par proximité, par table, par type), noms toujours affichés, acteurs isolés masqués. Les choix de regroupement et de taille du panneau *Analyse du réseau* ne valent que pour la personne qui consulte.
 
 Pour la vue *Positions*, le widget propose d'ajouter les colonnes `Influence` et `Interet` (entiers de 0 à 5) aux tables d'acteurs. Elles se renseignent dans la fiche de chaque acteur.
 
@@ -66,6 +68,7 @@ Pour la vue *Positions*, le widget propose d'ajouter les colonnes `Influence` et
 
 - Les liens saisis désignent les acteurs **par leur nom** (ou par une référence si les colonnes `De` et `Vers` sont des références vers une table d'acteurs) : renommer un acteur coupe ses liens saisis par nom. Deux acteurs de même nom sont confondus.
 - Au-delà de quelques centaines d'acteurs, le graphe devient difficile à lire : utilisez les filtres ou la vue *Liste*.
+- Les communautés sont détectées par la méthode de Louvain, sur les liens affichés : c'est une lecture possible du réseau, pas une vérité. Changer les filtres peut changer les groupes.
 - Aucun audit RGAA n'a été mené. La vue *Liste* et les fiches sont l'alternative accessible au graphe.
 
 ## Version stable et version en cours
