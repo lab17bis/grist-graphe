@@ -502,8 +502,17 @@
         stable = true;
         if (etat.mouvement === 'temporaire') { etat.mouvement = 'non'; arreterVeille(); statut('Disposition stable.'); rendreVue(true); return; }
         statut('Disposition stable. Déplacez un acteur : les autres s\'ajustent.');
+        if (horsCadre(p)) rendreVue(true);   // des acteurs sont sortis du cadre : on recadre en douceur
       } else if (stable && calme === 0) { stable = false; statut('Les acteurs se placent…'); }
     }, 250);
+  }
+  function horsCadre(p) {
+    var l = graphe.getWidth(), h = graphe.getHeight();
+    return Object.keys(p).some(function (k) {
+      if (k.indexOf('__g:') === 0) return false;
+      var q = graphe.convertToPixel({ seriesIndex: 0 }, p[k]);
+      return q && (q[0] < 0 || q[1] < 0 || q[0] > l || q[1] > h);
+    });
   }
   // Réorganise en mouvement (ou d'un coup si l'appareil demande moins d'animations).
   function reorganiserEnMouvement() {
