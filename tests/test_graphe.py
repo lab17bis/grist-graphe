@@ -72,11 +72,11 @@ with sync_playwright() as p:
     avant = etat()['positions']; x, y = pg.evaluate("ggPixel('Personnes:1')")
     pg.mouse.move(x, y); pg.mouse.down()
     for i in range(10): pg.mouse.move(x - 15 * i, y + 8 * i)
-    pg.mouse.up(); pg.wait_for_timeout(1200)
+    pg.mouse.up(); pg.wait_for_timeout(2000)
     apres = etat()['positions']
     autres = [k for k in avant if k in apres and not k.startswith('__') and k != 'Personnes:1' and abs(avant[k][0] - apres[k][0]) + abs(avant[k][1] - apres[k][1]) > 1]
     verifier('en mouvement : déplacer un acteur fait bouger les autres', len(autres) >= 5)
-    pg.click('#gg-animer'); pg.wait_for_timeout(500)
+    pg.click('#gg-animer'); pg.wait_for_function("ggEtat().mouvement === 'non'"); pg.wait_for_timeout(1000)
     avant = etat()['positions']; x, y = pg.evaluate("ggPixel('Structures:1')")
     pg.mouse.move(x, y); pg.mouse.down()
     for i in range(8): pg.mouse.move(x + 10 * i, y)
