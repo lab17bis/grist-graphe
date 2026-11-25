@@ -49,6 +49,15 @@ with sync_playwright() as p:
     pg.locator('[data-vue=liste]').click()
     verifier('vue liste : tableaux des acteurs et des liens', pg.locator('#gg-liste table').count() == 2 and pg.locator('#gg-liste tbody tr').count() == 28 + 78)
     pg.locator('[data-vue=graphe]').click()
+    # Aperçu réel : le graphe lui-même, avec le brouillon non enregistré
+    pg.locator('#gg-reglages').click(); pg.wait_for_selector('#gg-reglages-titre', state='attached')
+    pg.select_option('#rg-couleur', 'type')
+    pg.locator('.cl-barre label', has_text='Aperçu').click(); pg.wait_for_timeout(1200)
+    verifier('aperçu réel : le graphe est dans le cadre de l\'aperçu', pg.locator('.cl-apercu .gg-cadre').count() == 1 and pg.locator('.cl-apercu #gg-graphe canvas').count() >= 1)
+    verifier('aperçu réel : les réglages non enregistrés s\'appliquent', etat()['options']['couleurPar'] == 'type')
+    pg.locator('.cl-barre label', has_text='Réglages').click(); pg.wait_for_timeout(1200)
+    verifier('aperçu quitté : graphe revenu dans son onglet, réglages enregistrés rétablis', pg.locator('.cl-apercu .gg-cadre').count() == 0 and etat()['options']['couleurPar'] != 'type')
+    pg.locator('.cl-barre label').first.click(); pg.wait_for_timeout(500)
     # Réglages
     pg.locator('#gg-reglages').click(); pg.wait_for_selector('#gg-reglages-titre', state='attached')
     pg.select_option('#rg-couleur', 'type'); pg.select_option('#rg-taille', 'influence')

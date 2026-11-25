@@ -775,7 +775,7 @@
   });
   document.getElementById('gg-reorganiser').addEventListener('click', function () { positions = {}; rendreVue(); });
   // Coque à onglets : la vue (graphe, positions, liste), les réglages, l'en-tête et le pied, l'aperçu, la publication.
-  var configLab = null, zoneConfig = document.getElementById('gg-coque'), pageEditee = null;
+  var configLab = null, zoneConfig = document.getElementById('gg-coque'), pageEditee = null, brutAvantApercu = null;
   function monterCoque() {
     if (configLab || !zoneConfig || !window.ConfigLab) return;
     pageEditee = JSON.parse(JSON.stringify(options.page || { marque: '', titre: 'Liens entre acteurs', pied: { accessibilite: '' } }));
@@ -786,8 +786,18 @@
       onglets: [{ id: 'reglages', libelle: 'Réglages', rendre: function (zone) {
         zone.innerHTML = '<div class="cl-panneau"></div>'; zone.firstChild.appendChild(zoneReg); rendreReglages();
       } }],
-      apercu: function (zone) {
-        zone.innerHTML = '<h1 class="fr-h3">' + esc((etat.brouillon && etat.brouillon.titre) || options.titre || 'Liens entre acteurs') + '</h1><p class="fr-text--sm">Le graphe, les positions et la liste s\'affichent entre l\'en-tête et le pied de page.</p>';
+      // Aperçu réel : le graphe lui-même s'affiche sous l'en-tête, avec les réglages en cours (même non enregistrés).
+      surApercu: function (ouvert) {
+        if (ouvert) {
+          if (etat.brouillon && configLab && configLab.estModifie()) {
+            brutAvantApercu = optionsBrutes;
+            optionsBrutes = Object.assign({}, etat.brouillon, { page: pageEditee });
+            charger().then(rendre);
+          }
+        } else if (brutAvantApercu) {
+          optionsBrutes = brutAvantApercu; brutAvantApercu = null;
+          charger().then(rendre);
+        }
       },
       publication: { mode: 'connecte', adresseWidget: location.href.split('#')[0].split('?')[0],
         publier: { lienDoc: (optionsBrutes.publication && optionsBrutes.publication.lienDoc) || '', texte: 'Le graphe peut s\'afficher en page complète, sans compte Grist, en lecture seule : graphe, fiches, chemins et liste.',
@@ -797,7 +807,7 @@
           },
           surChangement: function (l) { if (!etat.brouillon) rendreReglages(); if (etat.brouillon) etat.brouillon.publication = { lienDoc: l }; } } },
       // La vue est masquée hors de son onglet : on évite de dessiner dans un conteneur sans taille.
-      surOnglet: function (id) { etat.configOuverte = id !== 'vue'; if (id === 'vue') { setTimeout(function () { rendreVue(); if (graphe) graphe.resize(); }, 50); } },
+      surOnglet: function (id) { etat.configOuverte = id !== 'vue' && id !== 'apercu'; if (id === 'vue' || id === 'apercu') { setTimeout(function () { rendreVue(); if (graphe) graphe.resize(); }, 50); } },
       surEnregistrer: function () {
         if (!etat.brouillon) rendreReglages();
         etat.brouillon.page = pageEditee;
