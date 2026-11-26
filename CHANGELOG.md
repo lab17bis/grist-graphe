@@ -2,6 +2,11 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-26 (tables déjà présentes dans le document)
+
+### Ajouté
+- Le panneau signale ce qui empêche de lire les données : table d'acteurs absente, colonne du nom introuvable, table des liens sans colonnes `De` et `Vers`, liens ignorés parce que leur acteur ne correspond à aucun acteur affiché.
+
 ## 2026-11-26 (style commun de configuration)
 
 ### Corrigé
