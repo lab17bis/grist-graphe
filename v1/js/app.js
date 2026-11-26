@@ -185,6 +185,28 @@
   // Construction du graphe
   // ---------------------------------------------------------------------------
 
+  // Ce qui empêche de lire les données choisies (table ou colonne absente, liens dont
+  // un acteur est introuvable) : signalé dans le panneau plutôt que passé sous silence.
+  var liensIgnores = 0;
+  function problemesSource() {
+    if (DEMO || PUBLIC) return [];
+    var p = [];
+    options.acteurs.forEach(function (a) {
+      if (meta.tables.indexOf(a.table) < 0) p.push('La table d\'acteurs <code>' + esc(a.table) + '</code> n\'existe pas dans ce document.');
+      else if (!colonne(a.table, a.nom)) p.push('La table <code>' + esc(a.table) + '</code> n\'a pas de colonne <code>' + esc(a.nom) + '</code> pour le nom des acteurs : choisissez la bonne colonne dans les réglages.');
+    });
+    if (options.liens) {
+      if (meta.tables.indexOf(options.liens) < 0) p.push('La table des liens <code>' + esc(options.liens) + '</code> n\'existe pas dans ce document.');
+      else if (!colonne(options.liens, 'De') || !colonne(options.liens, 'Vers')) p.push('La table des liens <code>' + esc(options.liens) + '</code> n\'a pas les colonnes <code>De</code> et <code>Vers</code> : ses lignes ne sont pas lues. Renommez dans Grist vos colonnes d\'origine et de destination en <code>De</code> et <code>Vers</code> : leurs données seront reprises.');
+      else if (liensIgnores) p.push(pluriel(liensIgnores, 'lien ignoré', 'liens ignorés') + ' : l\'acteur d\'origine ou de destination ne correspond à aucun acteur affiché (nom différent ou table d\'acteurs non choisie).');
+    }
+    return p;
+  }
+  function blocProblemes() {
+    var p = problemesSource();
+    return p.length ? '<div class="fr-alert fr-alert--warning fr-alert--sm fr-mt-2w">' + p.map(function (x) { return '<p>' + x + '</p>'; }).join('') + '</div>' : '';
+  }
+
   function construire() {
     acteurs = []; aretes = []; parId = {};
     var parNom = {};
@@ -205,10 +227,12 @@
       return parNom[cle(v)] || null;
     }
     // 1. Table de liens
+    liensIgnores = 0;
     if (options.liens && lignes[options.liens]) {
       lignes[options.liens].forEach(function (l) {
         var s = trouver(l.De, options.liens, 'De'), t = trouver(l.Vers, options.liens, 'Vers');
-        if (!s || !t || s === t) return;
+        if (!s || !t) { if (l.De || l.Vers) liensIgnores++; return; }
+        if (s === t) return;
         aretes.push({ id: 'L' + l.id, rowId: l.id, source: s, target: t, genre: 'lien', type: String(l.Type || 'Lien'), force: Math.max(1, Math.min(3, nombre(l.Force) || 1)), sens: l.Sens === 'À sens unique' ? 'unique' : 'reciproque', note: l.Note || '' });
       });
     }
@@ -744,6 +768,7 @@
     }
     h += blocAnalyse();
     h += '<p class="gg-compte" aria-live="polite">' + pluriel(xs.length, 'acteur') + ' · ' + pluriel(ar.length, 'lien') + (isoles ? ' · ' + pluriel(isoles, 'acteur isolé', 'acteurs isolés') : '') + '</p>';
+    h += blocProblemes();
     if (top.length) h += '<h2 class="fr-h6 fr-mt-2w">Les plus connectés</h2><ol class="gg-top">' + top.map(function (x) { return '<li><button type="button" class="fr-link fr-text--sm" data-acteur="' + esc(x.id) + '">' + esc(x.nom) + '</button> <span class="gg-compte">' + d[x.id] + '</span></li>'; }).join('') + '</ol>';
     if (!options.liens) h += '<div class="gg-encart"><p class="fr-text--sm fr-mb-1w">Pas encore de table de liens : créez-la pour saisir les liens entre acteurs (coopère avec, finance, conseille…).</p><button type="button" class="fr-btn fr-btn--sm" data-action="creer-liens">Créer la table Liens</button></div>';
     return h + datalist();
