@@ -29,7 +29,9 @@ Démonstration avec des données fictives (rien n'est enregistré) : <https://la
 
 1. **Ouvrir le document Grist** qui contient les acteurs, par exemple les tables `Structures` et `Personnes` partagées par les outils de la même famille.
 2. **Ajouter le widget** : *Ajouter › Ajouter un widget à la page › Personnalisé*, de préférence sur la table `Personnes` ou `Structures`. Dans le panneau de droite, choisissez *URL personnalisée*, saisissez `https://lab17bis.github.io/grist-graphe/v1/` et donnez l'**accès complet au document**.
-3. **Vérifier les réglages** (onglet *Réglages* de la barre d'onglets, qui réunit aussi *En-tête et pied*, *Aperçu* et *Publication* ; le bouton *Réglages* du panneau y mène aussi) : le widget reconnaît seul les tables `Structures`, `Personnes`, `Acteurs` ou `Partenaires` et la table `Liens`. Cliquez sur *Créer la table Liens* pour commencer à saisir des liens.
+3. **Vérifier les réglages** (onglet *Réglages* de la barre de l'éditeur, qui réunit aussi *En-tête et pied*, *Aperçu* et *Publication* ; le graphe s'utilise dans *Aperçu*, ouvert par défaut ; *Ouvrir la configuration*, dans Grist, mène aux réglages) : le widget reconnaît seul les tables `Structures`, `Personnes`, `Acteurs` ou `Partenaires` et la table `Liens`. Cliquez sur *Créer la table Liens* pour commencer à saisir des liens.
+
+**Éditeur du widget ou page d'usage, avec le même lien.** Chaque vue Grist choisit ce qu'elle affiche (onglet *Publication*, rubrique *Affichage de cette vue Grist*) : l'**éditeur du widget** (affichage par défaut) ou la **page d'usage** (l'outil avec son en-tête et son pied de page, sans barre de réglages ; un lien *Éditer le widget*, en bas de page, rouvre l'éditeur). Pour avoir les deux dans un document, ajoutez deux vues Personnalisées avec la même adresse. Ce choix n'est pas une protection : les droits restent ceux du document (Partager, Permissions avancées).
 
 Le widget suit la ligne sélectionnée dans Grist : choisir une personne dans un tableau ouvre sa fiche dans le graphe, et inversement.
 

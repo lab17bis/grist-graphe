@@ -934,6 +934,7 @@
     var brut = JSON.parse(JSON.stringify(o));
     optionsBrutes = brut;
     if (DEMO) return Promise.resolve();
+    if (window.BarreLab && window.BarreLab.modeEnregistre()) { brut.modeLab = window.BarreLab.modeEnregistre(); } // garde l'affichage choisi pour cette vue
     return grist.setOptions(brut);
   }
 
@@ -1080,7 +1081,7 @@
     if (configLab || !zoneConfig || !window.ConfigLab) return;
     pageEditee = JSON.parse(JSON.stringify(options.page || { marque: '', titre: 'Liens entre acteurs', pied: { accessibilite: '' } }));
     configLab = window.ConfigLab.monter(zoneConfig, {
-      nom: 'Liens entre acteurs',
+      nom: 'Widget graphe',
       vue: { libelle: 'Graphe', element: document.querySelector('.gg-cadre') },
       page: pageEditee,
       onglets: [{ id: 'reglages', libelle: 'Réglages', rendre: function (zone) {
