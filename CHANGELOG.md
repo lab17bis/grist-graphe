@@ -2,6 +2,9 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-28 (hauteur de la zone du graphe)
+- Correction : dans l'éditeur (Aperçu), la zone du graphe s'allongeait jusqu'au bas du panneau de gauche ; le graphe, centré dans cette zone, apparaissait très bas et le haut semblait vide. La zone tient maintenant dans l'écran et le panneau de gauche défile.
+
 ## 2026-11-28 (organigramme)
 - Nouvelle vue **Organigramme**, à côté de Graphe, Positions et Liste : l'arbre de l'organisation, construit depuis les références entre tables d'acteurs (personne sous sa structure, structure sous sa structure mère). Les personnes d'une même structure s'empilent en colonne ; un clic ouvre la fiche.
 - Réglages › Organigramme : vue à l'ouverture (le graphe reste la vue par défaut), sens (de haut en bas ou de gauche à droite), autres liens en pointillé (non par défaut).
