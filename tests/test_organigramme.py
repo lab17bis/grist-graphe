@@ -51,6 +51,26 @@ with sync_playwright() as p:
     verifier('sens horizontal : chaque trait va vers la droite', arbre and all(noeuds[l['target']]['x'] > noeuds[l['source']]['x'] for l in arbre))
     verifier('autres liens affichés en pointillé', len([l for l in s['links'] if l.get('lineStyle', {}).get('type') == 'dotted']) > 0)
     pg.locator('#gg-graphe').screenshot(path='/tmp/organigramme-horizontal.png')
+    # Dans Grist (API simulée) : structure mère par la colonne Parent, personne sous sa structure,
+    # et un doublon fusionné (Fusionne_dans, annuaire) reste sous sa structure, pas sous l'autre personne.
+    import json
+    mockjs = open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'grist-mock.js')).read()
+    pg2 = b.new_page(viewport={'width': 1280, 'height': 860}); pg2.on('pageerror', lambda e: erreurs.append(str(e)))
+    pg2.route('https://docs.getgrist.com/grist-plugin-api.js', lambda r: r.fulfill(status=200, content_type='application/javascript', body=mockjs))
+    pg2.goto(f'http://localhost:{PORT}/tests/hote.html')
+    m = {'tables': {
+        'Structures': {'colonnes': {'Nom': {'type': 'Text'}, 'Parent': {'type': 'Ref:Structures'}}, 'lignes': [{'id': 1, 'Nom': 'Rectorat', 'Parent': 0}, {'id': 2, 'Nom': 'Service RH', 'Parent': 1}]},
+        'Personnes': {'colonnes': {'Nom': {'type': 'Text'}, 'Structure': {'type': 'Ref:Structures'}, 'Fusionne_dans': {'type': 'Ref:Personnes'}},
+          'lignes': [{'id': 1, 'Nom': 'MARTIN Camille', 'Structure': 2, 'Fusionne_dans': 0}, {'id': 2, 'Nom': 'Camille MARTIN', 'Structure': 2, 'Fusionne_dans': 1}, {'id': 3, 'Nom': 'GARCIA Maxime', 'Structure': 1, 'Fusionne_dans': 0}]}},
+        'table': 'Personnes', 'utilisateur': {'email': 'a@b.fr', 'nom': 'A'}}
+    pg2.evaluate('m => { window.MOCK = m; charger(); }', m)
+    f2 = pg2.frame_locator('#w'); f2.locator('.gg-filtre').first.wait_for(); pg2.wait_for_timeout(500); f2.locator('[data-vue=organigramme]').click(); pg2.wait_for_timeout(1200)
+    s2 = pg2.evaluate("() => { var w = document.getElementById('w').contentWindow; return w.echarts.getInstanceByDom(w.document.getElementById('gg-graphe')).getOption().series[0]; }")
+    nom = {n['id']: n['name'] for n in s2['data']}
+    paires = sorted((nom[l['source']], nom[l['target']]) for l in s2['links'] if l.get('lineStyle', {}).get('type') == 'solid')
+    verifier('dans Grist : Parent, structure de la personne, doublon fusionné ignoré', ('Rectorat', 'Service RH') in paires and ('Rectorat', 'GARCIA Maxime') in paires
+             and not any(a == 'MARTIN Camille' and c == 'Camille MARTIN' for a, c in paires) and any(c == 'Camille MARTIN' and a in ('Service RH', 'MARTIN Camille', 'Camille MARTIN') for a, c in paires))
+    print('  traits :', paires)
     verifier('aucune erreur JavaScript', not erreurs)
     if erreurs: print(erreurs)
     b.close()

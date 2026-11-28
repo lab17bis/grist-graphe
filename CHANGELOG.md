@@ -6,7 +6,8 @@ Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans ret
 - Nouvelle vue **Organigramme**, à côté de Graphe, Positions et Liste : l'arbre de l'organisation, construit depuis les références entre tables d'acteurs (personne sous sa structure, structure sous sa structure mère). Les personnes d'une même structure s'empilent en colonne ; un clic ouvre la fiche.
 - Réglages › Organigramme : vue à l'ouverture (le graphe reste la vue par défaut), sens (de haut en bas ou de gauche à droite), autres liens en pointillé (non par défaut).
 - Les boutons Animer et Réorganiser sont bien masqués hors de la vue Graphe (l'attribut hidden ne suffisait pas avec les boutons DSFR).
-- Nouveau test `tests/test_organigramme.py`.
+- Rattachement : d'abord une colonne `Parent`, puis une référence vers une autre table (la structure d'une personne) ; la colonne `Fusionne_dans` de l'annuaire (doublons fusionnés) est ignorée.
+- Nouveau test `tests/test_organigramme.py` (démonstration et Grist simulé) ; test du graphe fiabilisé (acteur visé hors de la fenêtre, stabilisation plus longue).
 
 ## 2026-11-27 (accès au document)
 - Barre de l'éditeur : le nom du widget et son statut restent sur une ligne ; la barre ne change plus de hauteur quand le statut passe à « non enregistré ».

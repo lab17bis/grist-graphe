@@ -632,10 +632,13 @@
     options.acteurs.forEach(function (a) {
       var cols = (meta.colonnes[a.table] || []).filter(function (c) {
         var cible = cibleRef(a.table, c.colId);
-        return cible && c.colId !== a.type && options.acteurs.some(function (b) { return b.table === cible; });
+        // Fusionne_dans (annuaire) désigne un doublon fusionné, pas un rattachement.
+        return cible && c.colId !== a.type && !/^Fusionne/i.test(c.colId) && options.acteurs.some(function (b) { return b.table === cible; });
       });
-      // Une référence vers la même table (structure mère) passe avant les autres.
-      cols.sort(function (c1, c2) { return (cibleRef(a.table, c2.colId) === a.table ? 1 : 0) - (cibleRef(a.table, c1.colId) === a.table ? 1 : 0); });
+      // Ordre de préférence : une colonne Parent, puis les références vers une autre table (la structure d'une personne),
+      // puis les autres références vers la même table.
+      var rang = function (c) { return /^parent$/i.test(c.colId) ? 0 : cibleRef(a.table, c.colId) !== a.table ? 1 : 2; };
+      cols.sort(function (c1, c2) { return rang(c1) - rang(c2); });
       (lignes[a.table] || []).forEach(function (r) {
         var x = parId[a.table + ':' + r.id];
         if (!x || !vis[x.id]) return;
@@ -1208,7 +1211,7 @@
     if (b) selectionner(b.getAttribute('data-acteur'), true);
   });
   document.querySelectorAll('[data-vue]').forEach(function (b) {
-    b.addEventListener('click', function () { etat.vue = b.getAttribute('data-vue'); rendreVue(); });
+    b.addEventListener('click', function () { etat.vue = b.getAttribute('data-vue'); etat.vueChoisie = true; rendreVue(); });
   });
   document.getElementById('gg-reorganiser').addEventListener('click', function () { positions = {}; sansCapture = true; rendreVue(); });
   document.getElementById('gg-animer').addEventListener('click', basculerMouvement);
