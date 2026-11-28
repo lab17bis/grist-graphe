@@ -2,6 +2,9 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-28 (statut de l'éditeur)
+- Barre de l'éditeur : le statut affiche « Non enregistré » (au lieu de « Modifications non enregistrées »), plus court ; la barre ne passe plus sur deux lignes sur un écran étroit.
+
 ## 2026-11-28 (hauteur de la zone du graphe)
 - Correction : dans l'éditeur (Aperçu), la zone du graphe s'allongeait jusqu'au bas du panneau de gauche ; le graphe, centré dans cette zone, apparaissait très bas et le haut semblait vide. La zone tient maintenant dans l'écran et le panneau de gauche défile.
 
