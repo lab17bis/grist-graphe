@@ -68,8 +68,18 @@ with sync_playwright() as p:
     pg.locator('[data-vue=graphe]').click()
     pg.click('#gg-animer')
     verifier('animer : bouton enfoncé', pg.get_attribute('#gg-animer', 'aria-pressed') == 'true' and pg.inner_text('#gg-animer') == 'Figer')
-    pg.wait_for_function("document.getElementById('gg-statut').textContent.indexOf('stable') >= 0", timeout=20000)
-    avant = etat()['positions']; x, y = pg.evaluate("ggPixel('Personnes:1')")
+    pg.wait_for_function("document.getElementById('gg-statut').textContent.indexOf('stable') >= 0", timeout=45000)
+    # L'acteur visé peut tomber sous le bas de la fenêtre (disposition aléatoire) : on fait défiler la page jusqu'à lui.
+    def viser(ident):
+        x, y = pg.evaluate("i => ggPixel(i)", ident)
+        if y > 820 or y < 80:
+            # Fait défiler le conteneur qui défile vraiment (la page, ou un ancêtre du graphe).
+            pg.evaluate("""d => { var e = document.getElementById('gg-graphe');
+              while (e && !(e.scrollHeight > e.clientHeight && /(auto|scroll)/.test(getComputedStyle(e).overflowY))) e = e.parentElement;
+              (e || document.scrollingElement).scrollBy(0, d); }""", y - 430); pg.wait_for_timeout(300)
+            x, y = pg.evaluate("i => ggPixel(i)", ident)
+        return x, y
+    avant = etat()['positions']; x, y = viser('Personnes:1')
     pg.mouse.move(x, y); pg.mouse.down()
     for i in range(10): pg.mouse.move(x - 15 * i, y + 8 * i)
     pg.mouse.up(); pg.wait_for_timeout(2000)
@@ -77,7 +87,7 @@ with sync_playwright() as p:
     autres = [k for k in avant if k in apres and not k.startswith('__') and k != 'Personnes:1' and abs(avant[k][0] - apres[k][0]) + abs(avant[k][1] - apres[k][1]) > 1]
     verifier('en mouvement : déplacer un acteur fait bouger les autres', len(autres) >= 5)
     pg.click('#gg-animer'); pg.wait_for_function("ggEtat().mouvement === 'non'"); pg.wait_for_timeout(1000)
-    avant = etat()['positions']; x, y = pg.evaluate("ggPixel('Structures:1')")
+    avant = etat()['positions']; x, y = viser('Structures:1')
     pg.mouse.move(x, y); pg.mouse.down()
     for i in range(8): pg.mouse.move(x + 10 * i, y)
     pg.mouse.up(); pg.wait_for_timeout(500)

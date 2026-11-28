@@ -2,6 +2,12 @@
 
 Les adresses `/v1/` ne changent pas : chaque version ajoute ou corrige, sans retirer ce qui existe.
 
+## 2026-11-28 (organigramme)
+- Nouvelle vue **Organigramme**, à côté de Graphe, Positions et Liste : l'arbre de l'organisation, construit depuis les références entre tables d'acteurs (personne sous sa structure, structure sous sa structure mère). Les personnes d'une même structure s'empilent en colonne ; un clic ouvre la fiche.
+- Réglages › Organigramme : vue à l'ouverture (le graphe reste la vue par défaut), sens (de haut en bas ou de gauche à droite), autres liens en pointillé (non par défaut).
+- Les boutons Animer et Réorganiser sont bien masqués hors de la vue Graphe (l'attribut hidden ne suffisait pas avec les boutons DSFR).
+- Nouveau test `tests/test_organigramme.py`.
+
 ## 2026-11-27 (accès au document)
 - Barre de l'éditeur : le nom du widget et son statut restent sur une ligne ; la barre ne change plus de hauteur quand le statut passe à « non enregistré ».
 - Dans Grist, quand le widget ne peut pas lire le document (accès complet non accordé, ou compte sans droit de lecture), un message le dit et indique quoi faire, au lieu d'un outil vide ou d'un écran d'installation. Contrôle commun, dans `commun/barre.js`.

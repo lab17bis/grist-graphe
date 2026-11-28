@@ -11,6 +11,7 @@ Tout se règle dans Grist, sans toucher au code. Le dépôt ne contient que le c
 | **Graphe** | Voir le réseau d'un coup d'œil : la taille d'un acteur dépend de son nombre de liens (ou de son influence), l'épaisseur d'un lien de sa force, une flèche indique un lien à sens unique. Zoom, déplacement, survol |
 | **Fiche d'un acteur** | Ses informations, ses liens classés par nature, l'ajout ou la suppression d'un lien, la saisie de son influence et de son intérêt. Ses voisins sont mis en avant dans le graphe |
 | **Chemin** | Le plus court chemin entre deux acteurs : par qui passer pour atteindre telle structure ? |
+| **Organigramme** | L'arbre de l'organisation : chaque acteur sous celui que vise une de ses références vers une table d'acteurs (une personne sous sa structure, un service sous sa structure mère, colonne `Parent` par exemple). Les personnes d'une même structure s'empilent en colonne. De haut en bas ou de gauche à droite ; les autres liens peuvent s'ajouter en pointillé. Un clic ouvre la fiche |
 | **Positions** | La matrice influence / intérêt des parties prenantes : associer étroitement, satisfaire, informer, surveiller |
 | **Liste** | Les acteurs (du plus au moins connecté) et tous les liens en tableaux : l'alternative accessible au graphe |
 | **Filtres** | Par catégorie d'acteurs et par nature de lien ; les acteurs les plus connectés et les acteurs isolés |
@@ -42,6 +43,8 @@ Les réglages sont enregistrés **avec le widget** (propres à la vue) :
 - **Tables d'acteurs** : pour chacune, la colonne du nom, la colonne du type et un libellé (« Structures », « Personnes »…). Chaque table a sa forme : carré arrondi, rond, losange, triangle.
 - **Table des liens**, **rattachements** (oui ou non) et **sources de participation commune** : table, colonne qui cite les acteurs (référence multiple, liste de choix ou texte séparé par des virgules), regroupement facultatif. Une source peut ne retenir que certaines lignes : dans les options du widget, `"condition": { "colonne": "Type", "operateur": "different", "valeur": "Plénière" }` écarte par exemple les plénières, où tout le monde se croise.
 - **Affichage** : couleur selon la table ou selon le type, taille selon le nombre de liens, le rôle de passerelle ou l'influence, regroupement à l'ouverture (aucun, par proximité, par table, par type), noms toujours affichés, acteurs isolés masqués. Les choix de regroupement et de taille du panneau *Analyse du réseau* ne valent que pour la personne qui consulte.
+
+- **Organigramme** : vue à l'ouverture (graphe par défaut, ou organigramme), sens (de haut en bas, ou de gauche à droite pour les longues listes), autres liens en pointillé (non par défaut). Un acteur rattaché à plusieurs parents est placé sous le premier (la référence vers sa propre table passe en premier) ; une boucle de rattachements est rompue ; les acteurs ni rattachés ni parents restent visibles dans la vue *Liste*.
 
 Pour la vue *Positions*, le widget propose d'ajouter les colonnes `Influence` et `Interet` (entiers de 0 à 5) aux tables d'acteurs. Elles se renseignent dans la fiche de chaque acteur.
 

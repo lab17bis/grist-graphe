@@ -161,6 +161,10 @@
     o.regrouperPar = o.regrouperPar || '';
     if (o.etiquettes === undefined) o.etiquettes = true;
     o.masquerIsoles = !!o.masquerIsoles;
+    // Organigramme (nouveau mode) : le graphe reste la vue d'ouverture tant que rien n'est choisi.
+    o.vueOuverture = o.vueOuverture === 'organigramme' ? 'organigramme' : 'graphe';
+    o.organigrammeSens = o.organigrammeSens === 'horizontal' ? 'horizontal' : 'vertical';
+    o.organigrammeLiens = !!o.organigrammeLiens;
     o.titre = o.titre || '';
     return o;
   }
@@ -169,6 +173,7 @@
     return source.meta().then(function (m) {
       meta = m;
       options = optionsCompletes(optionsBrutes);
+      if (!etat.vueChoisie) { etat.vueChoisie = true; etat.vue = options.vueOuverture; }
       var tables = {};
       options.acteurs.forEach(function (a) { tables[a.table] = 1; });
       if (options.liens) tables[options.liens] = 1;
@@ -560,6 +565,9 @@
     b.textContent = oui ? 'Figer' : 'Animer';
     b.title = oui ? 'Arrêter le mouvement et garder la disposition' : 'Laisser les acteurs se placer d\'eux-mêmes ; déplacer un acteur fait bouger les autres';
     var st = document.getElementById('gg-statut'); if (st) st.hidden = etat.vue !== 'graphe';
+    // Les boutons DSFR imposent leur affichage : l'attribut hidden seul ne les masque pas.
+    var ro = document.getElementById('gg-reorganiser');
+    [b, ro].forEach(function (x) { if (x) { x.hidden = etat.vue !== 'graphe'; x.style.display = etat.vue !== 'graphe' ? 'none' : ''; } });
   }
 
   function optionGraphe() {
@@ -609,6 +617,115 @@
           return { source: l.source, target: l.target, value: l.value, symbol: ['none', 'none'], lineStyle: { width: 0, opacity: 0 },
             emphasis: { disabled: true }, blur: { lineStyle: { opacity: 0 } }, tooltip: { show: false } };
         }))
+      }]
+    };
+  }
+
+  // ---------------------------------------------------------------------------
+  // Organigramme : chaque acteur est placé sous son parent, c'est-à-dire l'acteur que vise une de ses références
+  // vers une table d'acteurs (une personne sous sa structure, un service sous sa structure mère, colonne Parent par exemple).
+  // Les autres liens peuvent s'afficher en pointillé. Les acteurs ni rattachés ni parents ne sont pas dessinés.
+  // ---------------------------------------------------------------------------
+  function hierarchie(xs) {
+    var vis = {}; xs.forEach(function (x) { vis[x.id] = x; });
+    var parent = {}, multiples = 0;
+    options.acteurs.forEach(function (a) {
+      var cols = (meta.colonnes[a.table] || []).filter(function (c) {
+        var cible = cibleRef(a.table, c.colId);
+        return cible && c.colId !== a.type && options.acteurs.some(function (b) { return b.table === cible; });
+      });
+      // Une référence vers la même table (structure mère) passe avant les autres.
+      cols.sort(function (c1, c2) { return (cibleRef(a.table, c2.colId) === a.table ? 1 : 0) - (cibleRef(a.table, c1.colId) === a.table ? 1 : 0); });
+      (lignes[a.table] || []).forEach(function (r) {
+        var x = parId[a.table + ':' + r.id];
+        if (!x || !vis[x.id]) return;
+        var trouves = [];
+        cols.forEach(function (c) {
+          liste(r[c.colId]).forEach(function (id) { var p = parId[cibleRef(a.table, c.colId) + ':' + id]; if (p && p !== x && vis[p.id] && trouves.indexOf(p) < 0) trouves.push(p); });
+        });
+        if (trouves.length) { parent[x.id] = trouves[0]; if (trouves.length > 1) multiples++; }
+      });
+    });
+    // Une boucle (A sous B, B sous A) est rompue : le premier acteur rencontré devient une racine.
+    Object.keys(parent).forEach(function (id) {
+      var vu = {}, p = id;
+      while (parent[p]) { if (vu[p]) { delete parent[id]; break; } vu[p] = 1; p = parent[p].id; }
+    });
+    var enfants = {}, racines = [], isoles = 0;
+    xs.forEach(function (x) { var p = parent[x.id]; if (p) (enfants[p.id] = enfants[p.id] || []).push(x); });
+    xs.forEach(function (x) { if (!parent[x.id]) { if (enfants[x.id]) racines.push(x); else isoles++; } });
+    var tri = function (a, b) { return (a.rangCat - b.rangCat) || String(a.nom).localeCompare(String(b.nom), 'fr'); };
+    // De haut en bas, les acteurs sans enfants d'un même parent (les personnes d'un service, par exemple) s'empilent
+    // en colonne sous lui : l'organigramme reste lisible au lieu de s'étaler sur une seule ligne très large.
+    var compact = options.organigrammeSens !== 'horizontal', PAS = 0.36;
+    var pos = {}, feuille = 0, profMax = 0;
+    function placer(x, prof) {
+      profMax = Math.max(profMax, prof);
+      var e = (enfants[x.id] || []).sort(tri);
+      if (!e.length) { pos[x.id] = [feuille++, prof]; return pos[x.id][0]; }
+      var feuilles = compact ? e.filter(function (c) { return !enfants[c.id]; }) : [];
+      var sous = feuilles.length > 1 ? e.filter(function (c) { return enfants[c.id]; }) : e;
+      var cs = [];
+      if (feuilles.length > 1) {
+        var col = feuille++;
+        feuilles.forEach(function (f, i) { pos[f.id] = [col, prof + 1 + i * PAS, 'colonne', i ? feuilles[i - 1].id : null]; });
+        profMax = Math.max(profMax, prof + 1 + (feuilles.length - 1) * PAS);
+        cs.push(col);
+      }
+      sous.forEach(function (c) { cs.push(placer(c, prof + 1)); });
+      pos[x.id] = [(Math.min.apply(null, cs) + Math.max.apply(null, cs)) / 2, prof];
+      return pos[x.id][0];
+    }
+    racines.sort(tri).forEach(function (r) { placer(r, 0); feuille += 0.6; });
+    var niveaux = {}; Object.keys(pos).forEach(function (id) { if (!pos[id][2]) niveaux[pos[id][1]] = 1; });
+    return { parent: parent, racines: racines, pos: pos, isoles: isoles, multiples: multiples, niveaux: Object.keys(niveaux).length + (Object.keys(pos).some(function (id) { return pos[id][2]; }) ? 1 : 0), largeur: feuille };
+  }
+
+  function optionOrganigramme(h) {
+    var ar = aretesVisibles(), xs = acteursVisibles(ar), d = degres(ar), g = groupesCouleur();
+    var horizontal = options.organigrammeSens === 'horizontal', couleurTexte = texteCss('--text-default-grey');
+    // Coordonnées en pixels, sans mise à l'échelle : l'organigramme garde des espacements lisibles ; s'il dépasse
+    // la zone, on le parcourt en le faisant glisser (molette pour zoomer).
+    var DX = horizontal ? 250 : 175, DY = horizontal ? 40 : 115;
+    var dessines = xs.filter(function (x) { return h.pos[x.id]; }), sel = etat.selection;
+    var maxA = 0, maxB = 0;
+    dessines.forEach(function (x) { var p = h.pos[x.id]; maxA = Math.max(maxA, p[0]); maxB = Math.max(maxB, p[1]); });
+    var lg = Math.max(1, (horizontal ? maxB : maxA) * DX), ht = Math.max(1, (horizontal ? maxA : maxB) * DY);
+    var zoneL = graphe ? graphe.getWidth() : 900;
+    var cadre = { largeur: lg, hauteur: ht, left: Math.max(60, (zoneL - lg - (horizontal ? 200 : 120)) / 2) };
+    var coord = function (x) { var p = h.pos[x.id]; return horizontal ? [p[1] * DX, p[0] * DY] : [p[0] * DX, p[1] * DY]; };
+    var arbre = dessines.filter(function (x) { return h.parent[x.id]; }).map(function (x) {
+      var p = h.parent[x.id], actif = !sel || sel === x.id || sel === p.id;
+      // Dans une colonne, le trait descend d'un membre au suivant : un seul trait vertical sous le parent.
+      return { source: h.pos[x.id][3] || p.id, target: x.id, symbol: ['none', 'none'], lineStyle: { width: 1.5, type: 'solid', color: actif && sel ? '#000091' : '#929292', opacity: actif ? 0.9 : 0.2, curveness: 0 } };
+    });
+    var dansArbre = {}; dessines.forEach(function (x) { dansArbre[x.id] = 1; });
+    var autres = !options.organigrammeLiens ? [] : ar.filter(function (a) {
+      return dansArbre[a.source.id] && dansArbre[a.target.id] && h.parent[a.source.id] !== a.target && h.parent[a.target.id] !== a.source;
+    }).map(function (a) {
+      var actif = !sel || a.source.id === sel || a.target.id === sel;
+      return { source: a.source.id, target: a.target.id, arete: a, symbol: a.sens === 'unique' ? ['none', 'arrow'] : ['none', 'none'],
+        lineStyle: { width: 1, type: 'dotted', color: actif && sel ? '#000091' : '#929292', opacity: actif ? 0.6 : 0.08, curveness: 0.3 } };
+    });
+    return {
+      animationDurationUpdate: 300,
+      tooltip: { confine: true, formatter: function (p) {
+        if (p.dataType === 'node') { var x = parId[p.data.id]; if (!x) return ''; var pa = h.parent[x.id]; return '<strong>' + esc(x.nom) + '</strong><br>' + esc([x.categorie, x.type].filter(Boolean).join(' · ')) + (pa ? '<br>Rattaché à ' + esc(pa.nom) : ''); }
+        var a = p.data.arete; if (!a) return ''; return esc(a.source.nom) + ' – ' + esc(a.target.nom) + '<br><strong>' + esc(a.type) + '</strong>' + (a.note ? '<br>' + esc(a.note) : '');
+      } },
+      series: [{
+        type: 'graph', layout: 'none', roam: true, draggable: false, scaleLimit: { min: 0.1, max: 6 },
+        left: cadre.left, top: 40, width: cadre.largeur, height: cadre.hauteur,
+        label: { show: true, position: horizontal ? 'right' : 'bottom', width: horizontal ? 200 : 130, overflow: 'break', fontFamily: 'Marianne, arial, sans-serif', fontSize: 11, color: couleurTexte },
+        emphasis: { focus: 'adjacency' },
+        edgeSymbolSize: [0, 7],
+        data: dessines.map(function (x) {
+          var c = coord(x), actif = !sel || sel === x.id || (h.parent[x.id] && h.parent[x.id].id === sel) || (h.parent[sel] && h.parent[sel].id === x.id);
+          return { id: x.id, name: x.nom, x: c[0], y: c[1], symbol: SYMBOLES[x.rangCat % SYMBOLES.length], symbolSize: Math.max(12, Math.min(28, tailleDe(x, d))),
+            itemStyle: { color: couleurDe(x, g), opacity: actif ? 1 : 0.25, borderColor: x.id === sel ? couleurTexte : '#fff', borderWidth: x.id === sel ? 3 : 1 },
+            label: { fontWeight: x.id === sel ? 'bold' : 'normal', opacity: actif ? 1 : 0.4, position: h.pos[x.id][2] ? 'right' : undefined } };
+        }),
+        links: arbre.concat(autres)
       }]
     };
   }
@@ -676,6 +793,21 @@
       // Un acteur déplacé à la main garde sa place.
       graphe.getZr().on('mouseup', function () { if (etat.vue === 'graphe' && etat.mouvement === 'non') capturer(); });
       window.addEventListener('resize', function () { if (!etat.configOuverte) graphe.resize(); });
+    }
+    if (etat.vue === 'organigramme') {
+      var hier = hierarchie(acteursVisibles(aretesVisibles()));
+      if (!hier.racines.length) {
+        graphe.clear();
+        info.innerHTML = '<div class="fr-callout gg-callout"><h2 class="fr-callout__title fr-h6">Organigramme</h2><p class="fr-callout__text fr-text--sm">Aucun rattachement à dessiner. L\'organigramme place chaque acteur sous celui que vise une de ses colonnes de référence vers une table d\'acteurs : une personne sous sa structure (colonne <code>Structure</code>), un service sous sa structure mère (colonne <code>Parent</code> de la table <code>Structures</code>). Ajoutez ou remplissez une telle colonne, et vérifiez que les deux tables sont choisies comme tables d\'acteurs dans les réglages.</p></div>';
+        return;
+      }
+      graphe.resize();
+      graphe.setOption(optionOrganigramme(hier), true);
+      info.innerHTML = '<p class="fr-text--xs gg-legende-positions">' + pluriel(Object.keys(hier.pos).length, 'acteur placé', 'acteurs placés') + ' sur ' + pluriel(hier.niveaux, 'niveau', 'niveaux') +
+        (hier.isoles ? ' · ' + pluriel(hier.isoles, 'acteur sans rattachement non affiché', 'acteurs sans rattachement non affichés') + ' (vue Liste)' : '') +
+        (hier.multiples ? ' · ' + pluriel(hier.multiples, 'acteur rattaché à plusieurs parents : placé sous le premier', 'acteurs rattachés à plusieurs parents : placés sous le premier') : '') +
+        (options.organigrammeLiens ? ' · Les autres liens sont en pointillé.' : '') + '</p>';
+      return;
     }
     if (etat.vue === 'positions') {
       var avec = acteurs.filter(function (x) { return x.influence !== null && x.interet !== null; }).length;
@@ -867,6 +999,11 @@
       '<div class="fr-select-group"><label class="fr-label" for="rg-regrouper">Regroupement à l\'ouverture<span class="fr-hint-text">Chaque personne peut le changer dans le panneau Analyse du réseau.</span></label><select class="fr-select fr-select--sm" id="rg-regrouper" data-reglage="regrouperPar">' + choix(REGROUPEMENTS, b.regrouperPar || '') + '</select></div>' +
       '<div class="fr-checkbox-group fr-checkbox-group--sm"><input type="checkbox" id="rg-etiq" data-reglage="etiquettes"' + (b.etiquettes ? ' checked' : '') + '><label class="fr-label" for="rg-etiq">Afficher tous les noms</label></div>' +
       '<div class="fr-checkbox-group fr-checkbox-group--sm"><input type="checkbox" id="rg-iso" data-reglage="masquerIsoles"' + (b.masquerIsoles ? ' checked' : '') + '><label class="fr-label" for="rg-iso">Masquer les acteurs sans lien</label></div>' +
+      '<h3 class="fr-h6 fr-mt-3w">Organigramme</h3>' +
+      '<p class="fr-text--sm">Chaque acteur est placé sous celui que vise une de ses colonnes de référence vers une table d\'acteurs : une personne sous sa structure, un service sous sa structure mère (colonne <code>Parent</code>, par exemple).</p>' +
+      '<div class="fr-select-group"><label class="fr-label" for="rg-vue">Vue à l\'ouverture</label><select class="fr-select fr-select--sm" id="rg-vue" data-reglage="vueOuverture">' + choix([['graphe', 'Graphe'], ['organigramme', 'Organigramme']], b.vueOuverture) + '</select></div>' +
+      '<div class="fr-select-group"><label class="fr-label" for="rg-sens">Sens de l\'organigramme</label><select class="fr-select fr-select--sm" id="rg-sens" data-reglage="organigrammeSens">' + choix([['vertical', 'De haut en bas'], ['horizontal', 'De gauche à droite (longues listes)']], b.organigrammeSens) + '</select></div>' +
+      '<div class="fr-checkbox-group fr-checkbox-group--sm"><input type="checkbox" id="rg-orgl" data-reglage="organigrammeLiens"' + (b.organigrammeLiens ? ' checked' : '') + '><label class="fr-label" for="rg-orgl">Montrer aussi les autres liens, en pointillé</label></div>' +
       '<ul class="fr-btns-group fr-btns-group--inline-sm fr-btns-group--sm fr-mt-3w gg-actions-reglages"><li><button type="button" class="fr-btn" data-action="enregistrer">Enregistrer</button></li><li><button type="button" class="fr-btn fr-btn--secondary" data-action="annuler">Annuler</button></li></ul>';
     return h;
   }
